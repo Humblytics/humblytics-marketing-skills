@@ -25,7 +25,7 @@ Add this repository as a skill source in your Claude Code configuration:
 
 ```bash
 # Clone the repo
-git clone https://github.com/nicholasmorgan/ai-marketing-skills.git
+git clone https://github.com/Humblytics/ai-marketing-skills.git
 
 # Or reference skills directly in your project's AGENTS.md
 ```

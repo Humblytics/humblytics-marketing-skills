@@ -59,12 +59,16 @@ ai-marketing-skills/
   AGENTS.md
   LICENSE
   skills/
-    cro-optimizer/SKILL.md
-    ab-test-generator/SKILL.md
+    cro-optimizer/SKILL.md          (API)
+    ab-test-generator/SKILL.md      (API)
+    heatmap-analyst/SKILL.md        (API)
+    revenue-attributor/SKILL.md     (API)
+    funnel-reporter/SKILL.md        (API)
+    page-cro/SKILL.md
+    email-sequences/SKILL.md
+    seo-strategist/SKILL.md
     marketing-strategist/SKILL.md
-    funnel-reporter/SKILL.md
+    copywriting/SKILL.md
     ad-expert/SKILL.md
     content-strategist/SKILL.md
-    page-cro/SKILL.md
-    copywriting/SKILL.md
 ```

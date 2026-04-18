@@ -21,15 +21,20 @@ Generate data-driven A/B test configurations from Humblytics analytics and heatm
 - Designing multivariate test matrices
 - Reviewing and iterating on existing test results
 
-## API Configuration
+## Credentials
 
-Before using this skill, configure your Humblytics API credentials:
+This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
 
-- **API Key**: Set `HUMBLYTICS_API_KEY` environment variable or provide when prompted
-- **Property ID**: Your Humblytics property ID (found in Dashboard > Settings > API)
+Setup (one time):
+1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
+2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
+3. Get the key from Humblytics Dashboard > Settings > API
+4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
+
 - **Base URL**: `https://app.humblytics.com/api/external/v1`
+- **Docs**: https://docs.humblytics.com/api
 
-See https://docs.humblytics.com/api for full API documentation.
+If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
 
 ## Before You Start
 

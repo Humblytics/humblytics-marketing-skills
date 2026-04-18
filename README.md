@@ -49,16 +49,28 @@ Copy the relevant `SKILL.md` files into your project's `.cursor/skills/` or equi
 
 Several skills connect to the Humblytics API for live data. Before using them:
 
-1. Sign up at [app.humblytics.com](https://app.humblytics.com)
-2. Get your API key from **Dashboard > Settings > API**
-3. Set the `HUMBLYTICS_API_KEY` environment variable
-4. Find your Property ID in **Dashboard > Settings > API**
+1. Sign up at [app.humblytics.com](https://app.humblytics.com) and grab your API key + Property ID from **Dashboard > Settings > API**
+2. Copy the template: `cp .env.example .env`
+3. Fill in `HUMBLYTICS_API_KEY` (and optionally `HUMBLYTICS_PROPERTY_ID`) in `.env`
+4. Load it into your shell before running the agent: `source .env` (or use `direnv`, or add the exports to your shell profile)
+
+The `.env` file is gitignored by convention — **never commit it**, and **never paste API keys directly into the agent chat**. Skills read credentials from the environment; that's the only safe path.
 
 See the [Humblytics Agent Documentation](https://app.humblytics.com/agent.md) for the full API reference.
 
+### Meta Ads and Google Ads
+
+None of the skills in this repo call Meta Ads or Google Ads APIs directly. `revenue-attributor` asks you to paste spend data from your Ads Manager dashboards and pairs it with Humblytics attribution — no Meta App Review or Google Ads developer token required.
+
+**Do not hand the agent Meta access via the "system user + unapproved app" shortcut.** The tutorial (create a Business Manager system user, spin up a Meta App with the "manage fb page" use case, skip publish/verify, issue an access token, reuse it) circulates widely but is how accounts — including long-standing ones with seven-figure spend — are getting permanently banned right now. Meta is enforcing against unapproved-app API traffic.
+
+If you want to automate ad-spend ingestion later, it is out of scope for this repo and requires real platform setup:
+- **Meta Ads**: a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`). Draft/unpublished apps pulling production data is the exact pattern being banned. Budget weeks for review.
+- **Google Ads**: a Google Ads developer token (Basic for low-volume, Standard for production), OAuth on a manager account, and the developer token attached to every request.
+
 ## Security
 
-These skills never include hardcoded API keys or credentials. Every skill that requires API access instructs the user to provide their own credentials via environment variables. Never commit API keys to version control.
+These skills never include hardcoded API keys or credentials. Every API-connected skill reads credentials from environment variables only. Never commit `.env` files or paste keys into agent chat — both leak credentials into logs, transcripts, or version history.
 
 ## Resources
 

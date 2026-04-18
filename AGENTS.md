@@ -9,7 +9,8 @@ This repository contains Agent Skills for CRO and marketing workflows that integ
 ## Security Rules
 
 - NEVER hardcode API keys, secrets, tokens, or credentials in any file
-- ALWAYS use environment variables (`$HUMBLYTICS_API_KEY`) or prompt the user for credentials
+- ALWAYS read credentials from environment variables (`$HUMBLYTICS_API_KEY`) — do NOT ask the user to paste keys into chat, since that persists them in transcripts
+- Direct users to `.env.example` → `.env` → `source .env` when credentials are missing
 - NEVER commit `.env` files or any file containing real credentials
 - When referencing API keys in examples, use placeholders like `your_api_key_here` or `$HUMBLYTICS_API_KEY`
 

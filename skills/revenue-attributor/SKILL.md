@@ -21,14 +21,33 @@ Connect ad spend to actual Stripe revenue using Humblytics multi-touch attributi
 - Building a quarterly ad performance review for leadership
 - Deciding whether to kill, scale, or hold a specific campaign
 
-## API Configuration
+## Credentials
 
-- **API Key**: `HUMBLYTICS_API_KEY` env var or prompt user
-- **Property ID**: Humblytics Dashboard > Settings > API
+This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+
+Setup (one time):
+1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
+2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
+3. Get the key from Humblytics Dashboard > Settings > API
+4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
+
 - **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Stripe requirement**: The Humblytics property must have Stripe connected for revenue attribution to work
+- **Docs**: https://docs.humblytics.com/api
+- **Stripe requirement**: The Humblytics property must have Stripe connected for revenue attribution to work. No separate Stripe key is needed here — Humblytics handles Stripe ingestion internally.
 
-See https://docs.humblytics.com/api for full reference.
+If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
+
+### Meta Ads and Google Ads spend data
+
+This skill does **not** call Meta Ads or Google Ads APIs. Ad spend is **user-provided** — export a CSV or copy the relevant columns from your Ads Manager dashboard, and the skill pairs that with Humblytics-attributed revenue.
+
+**Do not wire up direct Meta API access via the "system user + unapproved app" shortcut.** There is a tutorial going around that walks through: create a Business Manager system user → create a Meta App with the "manage fb page" use case (skipping publish/verify) → assign the app to the system user → generate an access token → "use it like a private key." This looks like it works. It is also how accounts are getting permanently banned right now, including long-standing accounts with seven-figure ad spend histories. Meta is actively enforcing against unapproved-app API traffic.
+
+If you want to automate ad-spend ingestion later, it is out of scope for this skill and requires real platform setup:
+- **Meta Ads**: Create a Meta Developer App, add the Marketing API product, and complete **full App Review** for the specific permissions you need (e.g. `ads_read`). Do not use a draft/unpublished app to pull production data — that is the exact pattern Meta is banning. Budget weeks for review.
+- **Google Ads**: Apply for a Google Ads developer token (Basic for low-volume, Standard for production), set up OAuth on a manager account, and attach the developer token to every request. Basic access ships in days; Standard access requires a usage review.
+
+Neither credential belongs in this repo's `.env` today. If you add either later, document the app ID / developer token acquisition in your own setup notes — not in this skill.
 
 ## Before You Start
 

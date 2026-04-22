@@ -62,7 +62,7 @@ See the [Humblytics Agent Documentation](https://app.humblytics.com/agent.md) fo
 
 None of the skills in this repo call Meta Ads or Google Ads APIs directly. `revenue-attributor` asks you to paste spend data from your Ads Manager dashboards and pairs it with Humblytics attribution — no Meta App Review or Google Ads developer token required.
 
-**Avoid shortcutting direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft/unpublished app — regardless of how the token was issued — is how ad accounts (including long-standing ones with seven-figure spend) are getting permanently banned right now. Meta is actively enforcing against unapproved-app API traffic.
+**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic.
 
 If you want to automate ad-spend ingestion later, it is out of scope for this repo and requires real platform setup:
 - **Meta Ads**: a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`). Draft/unpublished apps pulling production data is the exact pattern being banned. Budget weeks for review.

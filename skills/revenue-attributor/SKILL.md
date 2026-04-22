@@ -41,7 +41,7 @@ If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.
 
 This skill does **not** call Meta Ads or Google Ads APIs. Ad spend is **user-provided** — export a CSV or copy the relevant columns from your Ads Manager dashboard, and the skill pairs that with Humblytics-attributed revenue.
 
-**Avoid shortcutting direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft/unpublished app — regardless of how the token was issued — looks like it works, but it is how accounts are getting permanently banned right now, including long-standing accounts with seven-figure ad spend histories. Meta is actively enforcing against unapproved-app API traffic.
+**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic.
 
 If you want to automate ad-spend ingestion later, it is out of scope for this skill and requires real platform setup:
 - **Meta Ads**: Create a Meta Developer App, add the Marketing API product, and complete **full App Review** for the specific permissions you need (e.g. `ads_read`). Do not use a draft/unpublished app to pull production data — that is the exact pattern Meta is banning. Budget weeks for review.

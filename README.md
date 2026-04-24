@@ -1,4 +1,4 @@
-# AI Marketing Skills
+# Humblytics Marketing Skills
 
 A collection of CRO and marketing agent skills for AI coding assistants. Built for the [Humblytics](https://humblytics.com) analytics platform and following the [Agent Skills](https://agentskills.io) specification.
 
@@ -36,7 +36,7 @@ Add this repository as a skill source in your Claude Code configuration:
 
 ```bash
 # Clone the repo
-git clone https://github.com/nicholasmorgan/ai-marketing-skills.git
+git clone https://github.com/Humblytics/humblytics-marketing-skills.git
 
 # Or reference skills directly in your project's AGENTS.md
 ```

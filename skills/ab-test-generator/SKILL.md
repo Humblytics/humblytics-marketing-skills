@@ -57,11 +57,11 @@ Pull data from Humblytics:
 - **Device split**: Mobile vs desktop behavior differences
 - **Source split**: How different traffic sources behave on this page
 
-API endpoints:
-- `GET /properties/{propertyId}/analytics/pages?url={pageUrl}` — Page metrics
-- `GET /properties/{propertyId}/heatmaps?url={pageUrl}` — Heatmap data
-- `GET /properties/{propertyId}/analytics/events?url={pageUrl}` — Page events
-- `GET /properties/{propertyId}/tests` — Existing tests
+API endpoints (all under `/api/external/v1/`, all take `start`, `end`, `timezone`):
+- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country, scroll depth, bounce)
+- `GET /properties/{propertyId}/clicks/details?page=/path` — Click data with UTM attribution (the public API has no `/heatmaps` endpoint; click data is the closest analogue)
+- `GET /properties/{propertyId}/forms/details?page=/path` — Form submissions and conversion rates for that page (no generic events endpoint exists publicly)
+- `GET /properties/{propertyId}/split-tests` — List existing experiments. Optional `?status=active|complete`
 
 ### Step 2: Identify Test Opportunities
 
@@ -128,22 +128,17 @@ Present this clearly:
 
 ### Step 5: Define Test Configuration
 
-Create the complete test spec for Humblytics:
+Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The required body shape is:
 
 ```json
 {
   "name": "descriptive-test-name",
-  "pageUrl": "/pricing",
-  "hypothesis": "Changing CTA from 'Start Free Trial' to 'See Your Analytics' will increase clicks because heatmap shows users hesitate at commitment language",
+  "page": "/pricing",
+  "type": "nocode",
   "variants": [
+    { "label": "control", "changes": [] },
     {
-      "name": "control",
-      "weight": 50,
-      "changes": []
-    },
-    {
-      "name": "variant-a",
-      "weight": 50,
+      "label": "variant-a",
       "changes": [
         {
           "selector": "#hero-cta",
@@ -153,30 +148,26 @@ Create the complete test spec for Humblytics:
       ]
     }
   ],
-  "primaryGoal": {
-    "type": "event",
-    "event": "signup_started"
-  },
-  "secondaryGoals": [
-    { "type": "event", "event": "cta_clicked" },
-    { "type": "metric", "metric": "bounce_rate" }
-  ],
-  "trafficAllocation": 100,
-  "minimumSampleSize": 2400,
-  "significanceLevel": 0.95
+  "goal": "signup_started",
+  "auto_stop_days": 30
 }
 ```
+
+Required fields: `name`, `page`, `type` (use `"nocode"` for selector-based tests), `variants` (each with `label` + `changes`).
+Optional: `goal` (primary conversion event), `auto_stop_days` (auto-end the test after N days).
 
 ### Step 6: Launch or Document
 
 **To launch via API:**
-- `POST /properties/{propertyId}/tests` — Create and start the test
-- `GET /properties/{propertyId}/tests/{testId}` — Monitor test status
-- `GET /properties/{propertyId}/tests/{testId}/results` — Pull results
+- `POST /properties/{propertyId}/split-tests` — Create and start the test (body shape above)
+- `GET /properties/{propertyId}/split-tests/{experimentId}` — Experiment details with per-variant metrics inline (no separate `/results` endpoint — variant metrics come back in the same response)
+- `PATCH /properties/{propertyId}/split-tests/{experimentId}` — Update an active experiment. Body: `{ "name": "...", "auto_stop_days": N }`
+- `POST /properties/{propertyId}/split-tests/{experimentId}/stop` — Stop a running experiment. Body: `{ "reason": "..." }`
+- `GET /properties/{propertyId}/split-test-recommendations?page=/path` — AI-generated split-test suggestions for a page
 
 **To document for manual launch:**
 - Output the full test specification
-- Include screenshot annotations if heatmap data informed the test
+- Include screenshot annotations if click-data informed the test
 - Provide the hypothesis document for the team
 
 ## Test Type Selection Guide

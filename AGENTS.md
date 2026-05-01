@@ -38,11 +38,14 @@ Followed by markdown content with these sections:
 ## Humblytics API
 
 Skills that connect to Humblytics use:
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Auth**: Bearer token via `HUMBLYTICS_API_KEY` environment variable
+- **Base URLs** (all accept the same Bearer key):
+  - `https://app.humblytics.com/api/external/v1` — traffic, pages, forms, clicks, funnels, split tests
+  - `https://app.humblytics.com/api/v1` — ads-attribution
+  - `https://app.humblytics.com/api` — meta-connections, google-ads-connections
+- **Auth**: Bearer token via `HUMBLYTICS_API_KEY` environment variable. Same key works on all three bases.
 - **Docs**: https://docs.humblytics.com/api
 
-The user must always provide their own API key and property ID.
+The user must always provide their own API key and property ID. Never accept a key pasted into chat — read from the env or stop and point the user at `.env.example`.
 
 ## Writing Style
 

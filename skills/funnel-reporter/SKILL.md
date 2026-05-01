@@ -49,14 +49,14 @@ If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.
 
 ### Step 1: Pull Traffic Data
 
-Retrieve top-of-funnel metrics from Humblytics:
+Retrieve top-of-funnel metrics from the Humblytics public API. All endpoints below sit under base `/api/external/v1/` and require `start`, `end`, and `timezone` query params (ISO 8601 datetimes + IANA timezone). Optional: `granularity` (`hour`/`day`/`week`/`month`) for time-series.
 
 **API Endpoints:**
-- `GET /properties/{propertyId}/analytics/overview?period={period}` — Aggregate metrics
-- `GET /properties/{propertyId}/analytics/pages?period={period}` — Page-level breakdown
-- `GET /properties/{propertyId}/analytics/sources?period={period}` — Traffic source attribution
-- `GET /properties/{propertyId}/analytics/devices?period={period}` — Device breakdown
-- `GET /properties/{propertyId}/analytics/locations?period={period}` — Geographic data
+- `GET /properties/{propertyId}/traffic/summary` — Aggregate metrics (pageviews, sessions, bounce rate, avg session duration)
+- `GET /properties/{propertyId}/traffic/trends` — Timeseries pageviews & unique visitors (use `granularity`)
+- `GET /properties/{propertyId}/pages/breakdown` — Page-level performance: views, visitors, scroll depth, bounce rate
+- `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions, all from the same endpoint
+- `GET /properties/{propertyId}/traffic/entry-exit-pages` — Top entry and exit pages
 
 **Key traffic metrics to pull:**
 - Total sessions and unique visitors
@@ -117,17 +117,30 @@ For each transition, report:
 
 ### Step 5: Conversion Events
 
-Pull event data for key conversion actions:
+The public API doesn't expose a generic events endpoint — pull conversion data from the dedicated form and click endpoints instead:
 
-- `GET /properties/{propertyId}/analytics/events?period={period}` — All tracked events
+- `GET /properties/{propertyId}/forms/breakdown` — All form submissions across pages
+- `GET /properties/{propertyId}/forms/details?page=/path` — Conversion rates for a specific form/page
+- `GET /properties/{propertyId}/clicks/breakdown` — Click data with top targets across all pages
+- `GET /properties/{propertyId}/clicks/details?page=/path` — Clicks on a specific page with UTM attribution
 
 Report on:
-- Signup completions
-- CTA clicks (by page and CTA)
-- Form submissions
-- Pricing page views
-- Trial starts
-- Upgrade/purchase events
+- Signup completions (forms/breakdown filtered to signup pages)
+- CTA clicks (clicks/details by page and CTA target)
+- Form submissions (forms/breakdown)
+- Pricing page views (pages/details with `?page=/pricing`)
+- Trial starts (forms/breakdown filtered to the trial-start form)
+- Upgrade/purchase events (forms/breakdown filtered to checkout/purchase)
+
+### Step 5.5: Attach Paid Attribution (when reporting revenue or paid channels)
+
+If the report needs to surface paid-channel performance, ROAS, or revenue-by-campaign, enrich the funnel with the Ads Attribution endpoint:
+
+- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+
+Returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions`, `revenue_conversions`, `revenue`, `roas`, plus `unmatched_ad_campaigns` (UTM hygiene gaps) and `unmatched_utm_campaigns` (organic/email traffic). Pair with `traffic/breakdown` source data to build a paid-vs-organic split.
+
+Note the different base path — this endpoint sits under `/api/v1/`, not `/api/external/v1/`. Same Bearer `HUMBLYTICS_API_KEY`. For raw connector metadata (ad accounts, daily insights, ad creative), use `/api/meta-connections` and `/api/google-ads-connections` — see `revenue-attributor` for the full workflow.
 
 ### Step 6: Period-over-Period Comparison
 

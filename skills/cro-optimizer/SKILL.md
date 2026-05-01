@@ -55,11 +55,15 @@ Retrieve analytics data from the Humblytics API:
 - **Device and source breakdowns** to identify segment-specific issues
 - **Heatmap summaries** if available for high-traffic pages
 
-Use the Humblytics API endpoints:
-- `GET /properties/{propertyId}/analytics/pages` — Page-level traffic
-- `GET /properties/{propertyId}/analytics/funnel` — Funnel step data
-- `GET /properties/{propertyId}/analytics/events` — Custom event tracking
-- `GET /properties/{propertyId}/heatmaps` — Click and scroll heatmap data
+Use the Humblytics public API endpoints. All sit under base `/api/external/v1/` and take `start`, `end`, `timezone` query params:
+
+- `GET /properties/{propertyId}/pages/breakdown` — Page-level traffic across the site
+- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country breakdowns, scroll depth)
+- `GET /properties/{propertyId}/funnels?steps={JSON}` — Funnel step data; the `steps` param is a JSON array describing each step. Optional: `mode=unbounded|sequential`, `breakdownBy`
+- `GET /properties/{propertyId}/funnels/sankey?steps={JSON}` — Sankey path diagram for the same funnel
+- `GET /properties/{propertyId}/forms/breakdown` and `forms/details?page=/path` — Form/conversion event data (the public API doesn't expose a generic `events` endpoint)
+- `GET /properties/{propertyId}/clicks/details?page=/path` — Click heatmap data for a specific page (no top-level `/heatmaps` endpoint exists; click data is the closest analogue)
+- `GET /properties/{propertyId}/clicks/breakdown` — Cross-page click comparison
 
 ### Step 2: Map the Funnel
 
@@ -95,6 +99,8 @@ For each high-drop-off step, investigate:
 - **Scroll depth** — Are users seeing the CTA? Check heatmap scroll data.
 - **Click patterns** — Are users clicking non-interactive elements? Confusing UI.
 - **Form fields** — For forms, which field has the highest abandonment rate?
+
+When the leak appears concentrated in **paid traffic** (drop-off significantly worse for `utm_source=google` or `utm_source=facebook` than for organic), pull `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=&endDate=` to see which specific campaigns are landing on the underperforming page. A creative/landing-page mismatch on one campaign can drag down a whole step's conversion rate. Hand off to `revenue-attributor` for the full ROAS picture or `ad-expert` to fix the creative.
 
 ### Step 5: Generate Test Hypotheses
 

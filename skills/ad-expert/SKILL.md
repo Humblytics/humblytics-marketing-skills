@@ -239,3 +239,15 @@ When creating an ad campaign, deliver:
 - **marketing-strategist** — Broader channel strategy and funnel design
 - **cro-optimizer** — Optimize the landing pages your ads drive traffic to
 - **content-strategist** — Create organic content that complements paid campaigns
+
+## Shared Frameworks (REQUIRED reading)
+
+Ad copy and landing-page coordination is where canon advice ("add urgency!", "use 'free'!") backfires loudest in B2B contexts. Read these before writing campaigns.
+
+- **`_shared/frameworks/anti-patterns.md`** — paid-media-specific counter-evidence:
+  - **Manufactured urgency**: detected fake urgency reduces customer LTV by 15–40%. A +20% short-term CVR lift can be net-negative on a CLTV basis. **B2B SaaS pricing-page countdowns frequently backfire** — buying committees read them as vendor desperation. FTC scrutiny is increasing on perpetual-reset timers.
+  - **"Free" in CTA copy**: Unbounce platform-wide data shows CTAs without "free" outperform CTAs with "free" by -16.8%. Counters the older Corcentric +99% myth. For B2B / enterprise, "free" can signal low-stakes / hobbyist product.
+  - **Customer logos**: high-variance. Docsend's +260% from enterprise→enterprise is the outlier; DoWhatWorks aggregate shows logos LOST in most A/B tests. Verify segment-match before using as a creative element.
+- **`_shared/frameworks/base-rate-priors.md`** — ad copy A/B tests have similar 25–35% win rates. When pitching creative variants, frame expected outcomes as "1-in-3 chance of beating control" not "this will lift ROAS 40%."
+- **`_shared/frameworks/preflight-checklist.md`** — confirm vertical, deal size, and audience awareness level before recommending copy formulas. Schwartz's 5 stages of awareness apply: cold traffic needs different ad copy than retargeted bottom-funnel prospects.
+- **`_shared/benchmarks/patterns.json`** — when proposing a creative angle, match to a `pattern_id` and quote evidence-backed lift ranges. Most relevant categories: `cta`, `headline`, `social_proof`, `urgency`.

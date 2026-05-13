@@ -228,3 +228,21 @@ Use these as reference points when analyzing data:
 - **ab-test-generator** — Create tests based on underperforming pages or steps
 - **marketing-strategist** — Use report data to inform strategic planning
 - **page-cro** — Deep-dive into specific underperforming pages
+
+## Shared Frameworks (REQUIRED reading)
+
+Two primitives are load-bearing for this skill. Without them, funnel reports fall back to flagging the highest-percentage drop and quoting raw decimals — both of which mislead.
+
+- **`_shared/frameworks/largest-leak-first.md`** — rank funnel steps by **absolute people lost**, not percentage drop. A 10% drop on 10,000 visitors (1,000 lost) outranks a 50% drop on 100 visitors (50 lost) by 20×. Compute `absolute_loss_per_step = step_in - step_out` first; only sort by percentage as a secondary view. This often inverts the priority order.
+
+- **`_shared/frameworks/percentile-framing.md`** — replace "your trial-to-paid CVR is low" with "your trial-to-paid CVR is 11%, at p25 in the OpenView B2B SaaS distribution (p50=14%, p75=22%) — meaningful headroom to median." Use the bands in `_shared/benchmarks/baselines.json`:
+  - All sites desktop: p50 = 3.82% CVR
+  - All sites mobile: p50 = 1.32% CVR (~3× desktop gap)
+  - B2B SaaS pricing page: p50 = 3.8% CVR (well-optimized: p75 = 8–12%)
+  - Ecommerce checkout fields: p50 = 11.3 fields (Baymard optimum = 8)
+
+- **`_shared/frameworks/preflight-checklist.md`** — confirm time range and traffic volume *before* the report. Funnel diagnostics on <500 sessions are noise, not signal — flag rather than pretend the percentages are meaningful.
+
+- **`_shared/benchmarks/baselines.json`** — full vertical baselines library. Cite the source on every comparison ("Aggregated Statsig/Eppo/FirstMark 2023-2024 reports").
+
+The existing benchmark table in this SKILL.md (Poor/OK/Good/Excellent) is a coarse heuristic. Prefer percentile-band framing from the baselines library when the vertical-stage-metric combination is present there.

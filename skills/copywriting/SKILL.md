@@ -262,3 +262,16 @@ Always deliver copy that is ready to use — not outlines, not suggestions, but 
 - **ad-expert** — Platform-specific ad copy requirements
 - **content-strategist** — Longer-form content and editorial copy
 - **marketing-strategist** — Align copy with funnel stage and campaign strategy
+
+## Shared Frameworks (REQUIRED reading)
+
+Copy work is the area where canon advice backfires most often. Read these before producing variants.
+
+- **`_shared/frameworks/anti-patterns.md`** — read in full. Copy-specific highlights:
+  - **"Free" in CTA copy is context-dependent**. Unbounce platform-wide data: CTAs *without* "free" outperform CTAs *with* "free" by **−16.8%** (10.79% vs 9.24%). CXL email test: no-"free" got +17%. The famous Corcentric +99% from "Free Demo" is the outlier, not the rule. For enterprise/sophisticated buyers, "free" signals low-stakes / hobbyist product.
+  - **Generic testimonials hurt trust**. Stock photos with names like "John, CEO", anonymized "satisfied customer" framing, polished "absolutely perfect" quotes — all underperform vs no testimonial. Use real names + photos + companies + specific quantified results.
+  - **Customer logos LOST in most DoWhatWorks A/B tests** unless audience-segment-matched. Don't recommend a logo strip as default trust signal.
+- **`_shared/frameworks/base-rate-priors.md`** — **only ~31% of headline rewrites beat control** (73-test study). When recommending a headline rewrite, frame as "roughly 1-in-3 chance of beating control with meaningful effect" — anchor on the base rate, not on the +104% best-case outliers in case studies. Most "headline wins" in published cases are confounded with value-prop, layout, and supporting-copy changes.
+- **`_shared/benchmarks/patterns.json`** — when proposing CTA copy, headline pattern, or trust language, match to a `pattern_id` and quote the evidence-backed lift range. Categories most relevant to copywriting: `cta`, `headline`, `social_proof`, `urgency`.
+
+Use these to **stop overselling** the lift magnitude. A good headline rewrite recommendation says "expected lift +5–15% if it wins, but base rate of headline-test wins is ~31% — plan accordingly" not "this will lift CVR 40%."

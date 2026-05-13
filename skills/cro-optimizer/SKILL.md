@@ -177,3 +177,15 @@ Present findings as:
 - **funnel-reporter** — Pull comprehensive funnel reports with revenue data
 - **page-cro** — Deep-dive into a specific page's conversion issues
 - **copywriting** — Generate optimized copy for test variants
+
+## Shared Frameworks (REQUIRED reading)
+
+Before producing recommendations, anchor your analysis against the shared primitives in `skills/_shared/`. Skipping these is the #1 cause of generic, low-confidence output.
+
+- **`_shared/frameworks/preflight-checklist.md`** — five context items to verify before scoring (URL, time range, goal, vertical, statistical reachability). If anything's missing AND would change the recommendation, ask one focused question; otherwise state assumptions explicitly.
+- **`_shared/frameworks/largest-leak-first.md`** — rank by absolute people lost, not by percentage drop. A 10% drop on 10,000 visitors outranks a 50% drop on 100. Always compute absolute loss per step before applying ICE.
+- **`_shared/frameworks/percentile-framing.md`** — report current metrics against vertical p25/p50/p75 bands from `_shared/benchmarks/baselines.json`. Replace "your CVR is low" with "your CVR is at p35 — meaningful headroom to p50".
+- **`_shared/frameworks/ice-confidence-rubric.md`** — anchor ICE.Confidence on evidence quality, not familiarity. 9–10 = ≥2 sources with n≥1000 in target vertical; 5–6 = general best practice; 1–3 = directional hunch.
+- **`_shared/frameworks/anti-patterns.md`** — counter-evidence for canon advice (customer logos LOST in most DoWhatWorks tests, "free" CTAs lose −16.8% platform-wide on Unbounce, hero video net-negative on mobile, etc.). Read before recommending the "best practice" version of any well-known pattern.
+- **`_shared/frameworks/base-rate-priors.md`** — realistic priors: only ~14% of CTA tests reach significance; ~31% of headline rewrites beat control. Anchor expectations against base rates, not best-case outliers.
+- **`_shared/benchmarks/patterns.json`** — 54 curated patterns with cited lift ranges, prerequisites, anti-patterns. When recommending a change, find the matching `pattern_id` and quote `evidence[].lift_range_pct` instead of guessing.

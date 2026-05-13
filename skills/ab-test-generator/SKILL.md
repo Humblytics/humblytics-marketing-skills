@@ -238,3 +238,19 @@ For each generated test, present:
 - **page-cro** — Deep page-level audit to inform test hypotheses
 - **copywriting** — Generate high-quality copy variants for tests
 - **funnel-reporter** — Track how test results affect downstream funnel metrics
+
+## Shared Frameworks (REQUIRED reading)
+
+Test design without grounding in base rates produces overconfident projections. Read these before generating test configs.
+
+- **`_shared/frameworks/base-rate-priors.md`** — load-bearing for this skill. Anchor expected impact against:
+  - **Only ~14% of CTA tests reach significance** (VWO/Wingify 2023 across thousands of tests)
+  - **~31% of headline rewrites beat control** (73-test study)
+  - Avg lift when a test wins: +49% — but most tests don't win
+  - If you propose 10 tests, expect 2–3 to win meaningfully. Frame the roadmap that way.
+- **`_shared/frameworks/ice-confidence-rubric.md`** — anchor Confidence on evidence quality from `_shared/benchmarks/patterns.json`, not on test-designer enthusiasm. 9–10 requires ≥2 independent sources with n≥1000 in the target vertical.
+- **`_shared/frameworks/anti-patterns.md`** — critical pitfalls when designing tests:
+  - **"Always multi-step" forms**: Baymard 2024 — step count exerts substantially less impact than total field count. A 15-field three-step form is worse than an 11-field three-step. Reduce fields BEFORE proposing step splits.
+  - **Bundled changes masquerading as a single test**: a "headline" test that also moves the sub-headline, image, and CTA isn't a headline test. Strict isolation matters when projecting future lift.
+  - **Underpowered tests stopped at the first peak**: regression-to-mean is severe in low-sample tests. Hold to the pre-computed sample size.
+- **`_shared/benchmarks/patterns.json`** — when generating a test config, find the matching `pattern_id` and use the evidence-backed `lift_range_pct` as the basis for the Expected Impact field. Don't quote the +260% Docsend outlier — quote the median.

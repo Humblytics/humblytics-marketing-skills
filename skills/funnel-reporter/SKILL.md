@@ -1,6 +1,6 @@
 ---
 name: funnel-reporter
-description: "End-to-end SaaS funnel reporting pulling live data from Humblytics API. Reports on traffic sources, page performance, signups, trial activations, conversions, and revenue metrics. Use when checking funnel metrics, building reports, analyzing traffic trends, or reviewing weekly/monthly marketing performance. Triggers: funnel report, traffic report, analytics report, weekly metrics, monthly report, dashboard, KPIs."
+description: "End-to-end SaaS funnel reporting pulling live data from Humblytics API. Reports on traffic sources, page performance, signups, conversions, and (only when a revenue connector is attached, else 0) trial activations and revenue metrics. Use when checking funnel metrics, building reports, analyzing traffic trends, or reviewing weekly/monthly marketing performance. Triggers: funnel report, traffic report, analytics report, weekly metrics, monthly report, dashboard, KPIs."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -49,11 +49,11 @@ If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.
 
 ### Step 1: Pull Traffic Data
 
-Retrieve top-of-funnel metrics from the Humblytics public API. All endpoints below sit under base `/api/external/v1/` and require `start`, `end`, and `timezone` query params (ISO 8601 datetimes + IANA timezone). Optional: `granularity` (`hour`/`day`/`week`/`month`) for time-series.
+Retrieve top-of-funnel metrics from the Humblytics public API. All endpoints below sit under base `/api/external/v1/` and require `start`, `end`, and `timezone` query params (ISO 8601 datetimes + IANA timezone). Optional: `granularity` (`hour`/`day`/`month`) for time-series. NOTE: `granularity=week` is currently bugged on traffic/trends and returns all-zero buckets — use `day` and aggregate to weeks client-side instead.
 
 **API Endpoints:**
 - `GET /properties/{propertyId}/traffic/summary` — Aggregate metrics (pageviews, sessions, bounce rate, avg session duration)
-- `GET /properties/{propertyId}/traffic/trends` — Timeseries pageviews & unique visitors (use `granularity`)
+- `GET /properties/{propertyId}/traffic/trends` — Timeseries pageviews & unique visitors (use `granularity=day`; avoid `week` — it returns all-zero buckets)
 - `GET /properties/{propertyId}/pages/breakdown` — Page-level performance: views, visitors, scroll depth, bounce rate
 - `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions, all from the same endpoint
 - `GET /properties/{propertyId}/traffic/entry-exit-pages` — Top entry and exit pages
@@ -132,13 +132,13 @@ Report on:
 - Trial starts (forms/breakdown filtered to the trial-start form)
 - Upgrade/purchase events (forms/breakdown filtered to checkout/purchase)
 
-### Step 5.5: Attach Paid Attribution (when reporting revenue or paid channels)
+### Step 5.5: Attach Paid Attribution (when reporting paid channels, plus revenue/trial activations only when a revenue connector is attached — else 0)
 
 If the report needs to surface paid-channel performance, ROAS, or revenue-by-campaign, enrich the funnel with the Ads Attribution endpoint:
 
 - `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
 
-Returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions`, `revenue_conversions`, `revenue`, `roas`, plus `unmatched_ad_campaigns` (UTM hygiene gaps) and `unmatched_utm_campaigns` (organic/email traffic). Pair with `traffic/breakdown` source data to build a paid-vs-organic split.
+Returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions` (always populated) plus `revenue`, `revenue_conversions`, `roas`, `trial_count` (these are 0 unless a revenue connector such as Stripe/ChartMogul is linked — do NOT report ROAS or revenue from this endpoint alone), and `unmatched_ad_campaigns` (UTM hygiene gaps) / `unmatched_utm_campaigns` (organic/email traffic). Pair with `traffic/breakdown` source data to build a paid-vs-organic split (spend/sessions only).
 
 Note the different base path — this endpoint sits under `/api/v1/`, not `/api/external/v1/`. Same Bearer `HUMBLYTICS_API_KEY`. For raw connector metadata (ad accounts, daily insights, ad creative), use `/api/meta-connections` and `/api/google-ads-connections` — see `revenue-attributor` for the full workflow.
 

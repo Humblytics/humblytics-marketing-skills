@@ -161,6 +161,7 @@ A/B TEST RECOMMENDATIONS:
 - [Expected lift]
 
 PERFORMANCE BENCHMARKS:
+- Pull expected open/CTR/conversion from your ESP — Humblytics does not expose email metrics; do not guess.
 - Expected open rate: [%]
 - Expected CTR: [%]
 - Expected conversion rate: [%]

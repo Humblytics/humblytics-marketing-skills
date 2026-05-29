@@ -1,6 +1,6 @@
 ---
 name: ab-test-generator
-description: "Reads page analytics and heatmap data from Humblytics, generates A/B test hypotheses with element selectors, and launches no-code split tests via the Humblytics API. Use when creating A/B tests, split tests, multivariate tests, or when you need to test headlines, CTAs, layouts, or pricing. Triggers: A/B test, split test, experiment, test hypothesis, launch test, variant."
+description: "Reads page analytics and click data from Humblytics, generates A/B test hypotheses with element selectors, and launches no-code split tests via the Humblytics API. Use when creating A/B tests, split tests, multivariate tests, or when you need to test headlines, CTAs, layouts, or pricing. Triggers: A/B test, split test, experiment, test hypothesis, launch test, variant."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -134,9 +134,9 @@ Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The
 {
   "name": "descriptive-test-name",
   "page": "/pricing",
-  "type": "nocode",
+  "type": "a_b",
   "variants": [
-    { "label": "control", "changes": [] },
+    { "label": "control", "is_control": true, "changes": [] },
     {
       "label": "variant-a",
       "changes": [
@@ -153,8 +153,10 @@ Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The
 }
 ```
 
-Required fields: `name`, `page`, `type` (use `"nocode"` for selector-based tests), `variants` (each with `label` + `changes`).
+Required fields: `name`, `page`, `type` (use `"a_b"` for selector-based tests; valid enum: `a_b`, `component_a_b`, `multivariate`, `component_multivariate`), `variants` (each with `label` + `changes`). Mark the control variant with `is_control: true` rather than relying on a magic label value like `"control"`.
 Optional: `goal` (primary conversion event), `auto_stop_days` (auto-end the test after N days).
+
+> **TBD — confirm the `changes[]` schema against a live split-test create.** This skill documents `attribute: "textContent"`, but the internal `cro-lead` skill uses `op: "text"`. The exact shape (`attribute` vs `op`, and the allowed values) has not been verified against a live create call here — treat it as unconfirmed and validate before relying on it.
 
 ### Step 6: Launch or Document
 

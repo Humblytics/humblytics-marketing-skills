@@ -10,7 +10,7 @@ metadata:
 
 ## Purpose
 
-Analyze conversion funnels using live Humblytics analytics data, identify the highest-impact drop-off points, and generate prioritized A/B test hypotheses with expected revenue impact. This skill turns raw analytics into a ranked optimization roadmap.
+Analyze conversion funnels using live Humblytics analytics data, identify the highest-impact drop-off points, and generate prioritized A/B test hypotheses with expected conversion-rate / volume impact. This skill turns raw analytics into a ranked optimization roadmap.
 
 ## When to Use
 
@@ -53,7 +53,7 @@ Retrieve analytics data from the Humblytics API:
 - **Page views and sessions** for each step in the funnel
 - **Event data** for key conversion actions (signups, clicks, form submissions)
 - **Device and source breakdowns** to identify segment-specific issues
-- **Heatmap summaries** if available for high-traffic pages
+- **Scroll depth via `pages/details`** and **click density via `clicks/details`** (no `/heatmaps` endpoint exists) for high-traffic pages
 
 Use the Humblytics public API endpoints. All sit under base `/api/external/v1/` and take `start`, `end`, `timezone` query params:
 
@@ -61,6 +61,8 @@ Use the Humblytics public API endpoints. All sit under base `/api/external/v1/` 
 - `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country breakdowns, scroll depth)
 - `GET /properties/{propertyId}/funnels?steps={JSON}` — Funnel step data; the `steps` param is a JSON array describing each step. Optional: `mode=unbounded|sequential`, `breakdownBy`
 - `GET /properties/{propertyId}/funnels/sankey?steps={JSON}` — Sankey path diagram for the same funnel
+
+> **Fallback when funnels are down.** `funnels` and `funnels/sankey` currently return HTTP 500 (verified live 2026-05-29). If they return 500 (or otherwise fail), approximate the funnel from the endpoints that do work: pull per-step page volume from `pages/breakdown` (and `funnels/suggestions?page=/path` for the ranked next-page sequence), and pull conversion-event volume for the final step(s) from `forms/breakdown`. Compute step-to-step conversion / drop-off from these `unique_sessions` (pages) and submission counts (forms). Note in your output that the funnel is an approximation from page + form breakdowns because the native funnel endpoint was unavailable.
 - `GET /properties/{propertyId}/forms/breakdown` and `forms/details?page=/path` — Form/conversion event data (the public API doesn't expose a generic `events` endpoint)
 - `GET /properties/{propertyId}/clicks/details?page=/path` — Click heatmap data for a specific page (no top-level `/heatmaps` endpoint exists; click data is the closest analogue)
 - `GET /properties/{propertyId}/clicks/breakdown` — Cross-page click comparison
@@ -96,7 +98,7 @@ For each high-drop-off step, investigate:
 - **Page load time** — Slow pages kill conversions. Check if the step has performance issues.
 - **Mobile vs desktop** — Is the drop-off concentrated on mobile? Layout/UX issue.
 - **Traffic source** — Do certain acquisition channels show higher drop-off? Expectation mismatch.
-- **Scroll depth** — Are users seeing the CTA? Check heatmap scroll data.
+- **Scroll depth** — Are users seeing the CTA? Check scroll depth via `pages/details` and click density via `clicks/details` (no `/heatmaps` endpoint exists).
 - **Click patterns** — Are users clicking non-interactive elements? Confusing UI.
 - **Form fields** — For forms, which field has the highest abandonment rate?
 
@@ -174,7 +176,7 @@ Present findings as:
 ## Related Skills
 
 - **ab-test-generator** — Take the hypotheses from this skill and generate actual test configurations
-- **funnel-reporter** — Pull comprehensive funnel reports with revenue data
+- **funnel-reporter** — Pull comprehensive funnel reports with traffic & conversion volume (revenue only if a Stripe/ChartMogul revenue connector is attached)
 - **page-cro** — Deep-dive into a specific page's conversion issues
 - **copywriting** — Generate optimized copy for test variants
 

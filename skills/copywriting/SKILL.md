@@ -62,10 +62,10 @@ Example: "One-click A/B testing" → which means → "no developer needed" → s
 Vague claims are invisible. Specific claims are believable.
 
 **Vague:** "Trusted by thousands of companies"
-**Specific:** "Used by 2,847 marketing teams across 40 countries"
+**Specific:** "Used by [EXAMPLE — replace with your own verified number] marketing teams across [EXAMPLE — replace with your own verified number] countries"
 
 **Vague:** "Improve your conversion rate"
-**Specific:** "The average Humblytics user increases their conversion rate by 23% in the first 90 days"
+**Specific:** "The average Humblytics user increases their conversion rate by [EXAMPLE — replace with your own verified number] in the first [EXAMPLE — replace with your own verified number] days"
 
 ### 4. One Idea Per Sentence
 

@@ -1,6 +1,6 @@
 ---
 name: heatmap-analyst
-description: "Heatmap analysis specialist that pulls click, scroll, and rage-click data from Humblytics to surface UX friction, ignored CTAs, and dead zones. Generates prioritized heatmap-driven optimization recommendations. Use when analyzing heatmaps, auditing click patterns, finding ignored elements, diagnosing scroll depth issues, or investigating rage clicks. Triggers: heatmap, click map, scroll map, rage click, dead zone, ignored CTA, UX friction, interaction audit."
+description: "Click-engagement analyst that pulls element-level click data, a page-level scroll proxy, and bounce/exit signals from Humblytics to surface UX friction and ignored CTAs. Generates prioritized, data-backed optimization recommendations. NOTE: the Humblytics public API does NOT provide pixel-level click heatmaps, scroll-depth distributions, or rage-click detection — those need a dedicated heatmap tool. Use when auditing element-level click patterns, finding ignored CTAs, gauging scroll engagement, or diagnosing on-page friction. Triggers: click analysis, element clicks, ignored CTA, click engagement, scroll engagement, UX friction, interaction audit."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -10,7 +10,9 @@ metadata:
 
 ## Purpose
 
-Analyze Humblytics heatmap data (click, scroll, and rage-click) to diagnose UX friction and generate prioritized design recommendations. This skill turns raw interaction data into specific, ranked improvements for layout, CTAs, and content hierarchy.
+Analyze Humblytics click-engagement data (element/target-level clicks, a single page-level scroll proxy, and bounce/exit signals) to diagnose UX friction and generate prioritized design recommendations. This skill turns the interaction data the API actually exposes into specific, ranked improvements for layout, CTAs, and content hierarchy.
+
+> **Scope note — what the Humblytics public API does and does not give you.** The API provides **element/target-level click counts** (with UTM breakdown), a **single average scroll percentage** per page, and **bounce/exit** signals. It does **NOT** provide pixel-level click heatmaps (x/y coordinates), a 25/50/75/100 scroll-depth distribution, rage-click detection, dead-zone maps, or per-device click segmentation. Anything in that second list requires a dedicated heatmap tool (e.g. Hotjar, Microsoft Clarity) — do not promise it from Humblytics. See **"NOT available via Humblytics API"** below.
 
 ## When to Use
 
@@ -26,15 +28,16 @@ Analyze Humblytics heatmap data (click, scroll, and rage-click) to diagnose UX f
 This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
 
 Setup (one time):
-1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
+1. `cp .env.example .env` at the **repo root** (the `.env.example` lives at the repo root, not in this skill dir) and fill in `HUMBLYTICS_API_KEY`
 2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
 3. Get the key from Humblytics Dashboard > Settings > API
 4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
 
 - **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Docs**: https://docs.humblytics.com/api
+- **Auth header**: `Authorization: Bearer $HUMBLYTICS_API_KEY`
+- **Docs**: https://docs.humblytics.com/
 
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
+If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` (at the repo root) — do not accept the key in chat.
 
 ## Before You Start
 
@@ -46,48 +49,56 @@ If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.
 
 ## Core Workflow
 
-### Step 1: Pull the Heatmap Data
+### Step 1: Pull the Interaction Data
 
-For each target page, fetch:
+For each target page, fetch what the API actually returns:
 
-- **Click heatmap** — Aggregated click coordinates by element + zone
-- **Scroll heatmap** — Depth distribution (what % reached 25/50/75/100%)
-- **Rage-click data** — Rapid repeated clicks on the same coordinate (frustration signal)
-- **Device split** — Desktop vs mobile vs tablet — heatmaps often diverge sharply
+- **Element-level clicks** — clicks grouped by element `target` (and `secondary`), with `clicks`, `unique_sessions`, `most_recent`, a per-element `trend`, and a `utm_breakdown` (clicks + share by UTM source/medium/campaign). This is element-level, **not** an x/y coordinate map.
+- **Scroll proxy** — a single `avg_scroll_percent` for the page (one number, e.g. 23.7), plus `bounce_rate`, `page_views`, `unique_visitors`, `avg_session_length`. This is **not** a 25/50/75/100 depth distribution.
+- **Cross-page click comparison** — per-page `total_clicks`, `unique_sessions`, and `top_targets[]{target, clicks, share}`.
+- **Entry/exit friction** — entry and exit pages as a friction proxy.
 
-Relevant Humblytics endpoints:
-- `GET /properties/{propertyId}/clicks/details?page=/path`
-- `GET /properties/{propertyId}/pages/details?page=/path` (for scroll depth + bounce)
-- `GET /properties/{propertyId}/clicks/breakdown` (for cross-page comparison)
+> Click **CTR is not a field** in the API — derive an engagement rate yourself as `clicks / unique_sessions` (or per-page `top_target.share`) when you need a CTR-like proxy.
 
-### Step 2: The Three Heatmap Questions
+Relevant Humblytics endpoints (all require `Authorization: Bearer $HUMBLYTICS_API_KEY`; pass `start`, `end` as ISO8601 and a `timezone` IANA name — there is no `?period=` shorthand):
+- `GET /properties/{propertyId}/clicks/details?page=/path&start=…&end=…&timezone=…` — element/target-level clicks + UTM breakdown
+- `GET /properties/{propertyId}/clicks/breakdown?start=…&end=…&timezone=…` — cross-page top targets
+- `GET /properties/{propertyId}/pages/details?page=/path&start=…&end=…&timezone=…` — `avg_scroll_percent` (scroll proxy) + `bounce_rate`
+- `GET /properties/{propertyId}/pages/breakdown?start=…&end=…&timezone=…` — page-level views/bounce across pages
+- `GET /properties/{propertyId}/traffic/entry-exit-pages?start=…&end=…&timezone=…` — entry/exit friction proxy
 
-Run each page through these three diagnostic questions:
+> **NOT available via Humblytics API (needs a dedicated heatmap tool):** pixel-level click coordinate heatmaps, scroll-depth distribution (25/50/75/100%), rage-click detection, dead-zone maps, and per-device click segmentation. If the user needs any of these, tell them Humblytics does not return them and point to a purpose-built heatmap tool (Hotjar, Microsoft Clarity, etc.).
+
+### Step 2: The Three Diagnostic Questions
+
+Run each page through these three questions, using only data the API returns:
 
 **Q1 — Are visitors clicking what you *want* them to click?**
-- Primary CTA click share: is it a meaningful fraction of total clicks?
+- Primary CTA click share: is the CTA `target` a meaningful fraction of `total_clicks` (use its `share` from `clicks/breakdown` or `clicks` from `clicks/details`)?
 - Secondary CTA click share: proportional to its importance?
-- Click-to-scroll ratio: are the clicks happening above or below the fold?
+- Which `target` dominates clicks, and is it a high-value action or a low-value/navigation element?
 
-**Q2 — Are visitors *seeing* the important content?**
-- Scroll depth distribution: at what depth does 50% of traffic drop off?
-- Is the primary CTA above or below that depth?
-- Is social proof / pricing / main value prop above that depth?
+**Q2 — Are visitors engaging deeply enough to *see* the important content?**
+- `avg_scroll_percent`: a low average (e.g. ~24%) suggests most visitors never reach below-fold content. This is a single average, **not** a depth distribution — do not claim "X% reached 50%".
+- Is the primary CTA likely above or below where that average scroll lands?
+- Cross-reference with `bounce_rate` from `pages/details`.
 
-**Q3 — Are visitors frustrated?**
-- Rage-click hotspots: clicking on non-clickable elements?
-- Dead links or unresponsive states?
-- Visual cues (underlines, button styling) that mislead?
+**Q3 — Where is the friction?**
+- High `bounce_rate` / exit share (from `pages/details` and `traffic/entry-exit-pages`) on a page that should convert = friction proxy.
+- Low scroll engagement on a long page where the CTA sits deep.
+- A CTA `target` that gets almost no clicks despite high page views = ignored CTA.
+
+> Frustration signals like rage clicks and clicks on non-interactive elements are **not** available from Humblytics — use the friction proxies above, and recommend a dedicated heatmap/session-replay tool if true rage-click detection is needed.
 
 ### Step 3: Identify the Top 3 Issues
 
 Rank all issues by **expected conversion impact**:
 
-1. **Blocker** — CTA below the fold for >50% of sessions, or core content unreachable
-2. **Friction** — Rage clicks on unresponsive elements, confusing affordances
-3. **Waste** — High click share on low-value elements (e.g., stock images)
+1. **Blocker** — Primary CTA gets a negligible share of clicks, or low `avg_scroll_percent` suggests core content is rarely reached
+2. **Friction** — High `bounce_rate` / exit share on a page meant to convert; confusing affordances
+3. **Waste** — High click share on low-value elements (e.g., a `Link`/nav target dominating clicks instead of the CTA)
 
-Always state the evidence: *"38% of mobile visitors never scroll past 45% — but the signup CTA sits at 62% depth."*
+Always state the evidence: *"avg_scroll_percent on the homepage is 24% and bounce_rate is 0.89, while the signup CTA `hero-try-free` took only 1.2% of clicks."*
 
 ### Step 4: Generate Recommendations
 
@@ -105,22 +116,24 @@ Write a clean report with:
 ```
 PAGE: [/path]
 DATE RANGE: [window]
-SESSIONS ANALYZED: [N]
+PAGE VIEWS / UNIQUE VISITORS: [page_views] / [unique_visitors]
 
 HEADLINE FINDING:
 [1 sentence capturing the biggest insight]
 
-CLICK PATTERN SUMMARY:
-- Primary CTA click share: X%
-- Highest-click element: [element] (Y% of clicks)
-- Below-fold click share: Z%
+CLICK PATTERN SUMMARY (from clicks/details + clicks/breakdown):
+- Primary CTA target + click share: [target] ([share]% of clicks)
+- Highest-click element: [target] ([share]% of clicks)
+- Total clicks / unique sessions: [total_clicks] / [unique_sessions]
+- Notable UTM skew (if any): [utm_source/medium] drives [share]% of a target's clicks
 
-SCROLL BEHAVIOR:
-- 50% of sessions reach: [depth]%
-- Primary CTA depth: [position]
-- Last-seen content at 50% drop-off: [element]
+SCROLL ENGAGEMENT (from pages/details — single average, not a distribution):
+- avg_scroll_percent: [N]%
+- Implication: [most visitors likely do / do not reach below-fold content]
 
-RAGE CLICKS DETECTED: [locations / count]
+FRICTION PROXIES:
+- bounce_rate: [N]
+- Top exit pages (entry-exit-pages): [pages]
 
 TOP 3 RECOMMENDATIONS (prioritized):
 1. [Change] — Expected impact: [X] — Difficulty: [level]
@@ -131,16 +144,20 @@ SUGGESTED A/B TESTS:
 - [Test hypothesis with clear control vs variant]
 ```
 
-## Heatmap Interpretation Cheatsheet
+## Interpretation Cheatsheet
+
+Based only on Humblytics-available signals (element-level click shares, single `avg_scroll_percent`, `bounce_rate`/exit):
 
 | Pattern | Likely Cause | Action |
 |---------|--------------|--------|
-| High clicks on non-interactive element | Looks clickable (underline, button styling) | Remove false affordance OR make it clickable |
-| Low scroll past 30% | Weak hook, above-fold doesn't earn attention | Rewrite headline or move proof above the fold |
+| A generic `Link`/nav `target` dominates clicks, CTA `target` near zero | CTA invisible, weak, or out-competed by navigation | Strengthen CTA prominence; reduce competing links |
+| Low `avg_scroll_percent` on a long page | Weak hook, above-fold doesn't earn attention | Rewrite headline or move proof/CTA above the fold |
 | CTA clicks concentrated on one variant | Other CTAs are invisible or redundant | Remove redundant CTAs; test single CTA variant |
-| Rage clicks on image | Users expect it to be clickable | Add link OR reduce visual prominence |
-| Even click distribution across page | No clear visual hierarchy | Add hierarchy: emphasize primary action |
-| Desktop clicks ≠ mobile clicks | Layout breaks or re-orders on mobile | Audit mobile design specifically |
+| High `bounce_rate` + low scroll on a convert-intent page | Above-fold fails to engage | Audit hero copy/offer; move value prop up |
+| Click share spread thinly across many targets | No clear visual hierarchy | Add hierarchy: emphasize primary action |
+| One UTM source's clicks skew heavily to a low-value target | Mismatched intent from that channel | Align landing experience to that source's intent |
+
+> Patterns that require pixel coordinates, rage-click detection, or per-device click maps (e.g. "rage clicks on image", "desktop clicks ≠ mobile clicks") are **not** diagnosable from Humblytics — use a dedicated heatmap tool.
 
 ## Related Skills
 

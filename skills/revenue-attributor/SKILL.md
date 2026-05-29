@@ -23,7 +23,7 @@ Connect ad spend to actual Stripe revenue using Humblytics multi-touch attributi
 
 ## Credentials
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs. Keep `HUMBLYTICS_API_KEY` out of `CLAUDE.md`, `.cursorrules`, and any file that gets committed to git.
 
 Setup (one time):
 1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
@@ -31,23 +31,34 @@ Setup (one time):
 3. Get the key from Humblytics Dashboard > Settings > API
 4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
 
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
+- **Bases used by this skill** (all accept the same Bearer `HUMBLYTICS_API_KEY`):
+  - `https://app.humblytics.com/api/external/v1` — traffic, pages, forms, clicks, funnels
+  - `https://app.humblytics.com/api/v1` — ads-attribution
+  - `https://app.humblytics.com/api` — meta-connections, google-ads-connections
 - **Docs**: https://docs.humblytics.com/api
 - **Stripe requirement**: The Humblytics property must have Stripe connected for revenue attribution to work. No separate Stripe key is needed here — Humblytics handles Stripe ingestion internally.
 
 If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
 
-### Meta Ads and Google Ads spend data
+### Three paths to ad data (Meta Ads + Google Ads)
 
-This skill does **not** call Meta Ads or Google Ads APIs. Ad spend is **user-provided** — export a CSV or copy the relevant columns from your Ads Manager dashboard, and the skill pairs that with Humblytics-attributed revenue.
+#### Path A — Humblytics connectors (preferred, read-only)
 
-**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic.
+If the property has Meta Ads or Google Ads connected at **Connectors** in the Humblytics dashboard, this skill pulls campaign metadata, daily insights, and full-funnel attribution directly through the public API — no Meta App Review, no Google Ads developer token. This is the default path. The connectors are **read-only** — they let the agent see campaign data and revenue, but not pause campaigns or change budgets.
 
-If you want to automate ad-spend ingestion later, it is out of scope for this skill and requires real platform setup:
-- **Meta Ads**: Create a Meta Developer App, add the Marketing API product, and complete **full App Review** for the specific permissions you need (e.g. `ads_read`). Do not use a draft/unpublished app to pull production data — that is the exact pattern Meta is banning. Budget weeks for review.
-- **Google Ads**: Apply for a Google Ads developer token (Basic for low-volume, Standard for production), set up OAuth on a manager account, and attach the developer token to every request. Basic access ships in days; Standard access requires a usage review.
+- Detect availability via `GET /api/meta-connections?propertyId=` and `GET /api/google-ads-connections?propertyId=`. Empty `connections` arrays mean nothing is connected; fall back to Path A2 below.
 
-Neither credential belongs in this repo's `.env` today. If you add either later, document the app ID / developer token acquisition in your own setup notes — not in this skill.
+#### Path A2 — User-provided CSV (fallback)
+
+If no connectors are set up, the skill asks the user to paste ad spend from Meta Ads Manager or Google Ads Editor. Pair the CSV columns with Humblytics-attributed revenue from `ads-attribution` (which still works for revenue even without a spend connector — it just leaves spend fields zero).
+
+#### Path B — Meta CLI (only when the agent needs to *manage* campaigns)
+
+For pausing laggards, shifting budget, or other write actions, point the user at Meta's official `meta ads` CLI (released April 29, 2026). It's a published, supported tool that creates resources in `PAUSED` status by default. Scope the access token to a single ad account, store it in `.env` (never `CLAUDE.md`), and review every campaign before flipping it active. This skill does not call the Meta CLI itself — it just hands off when management actions are required.
+
+#### Path C — Don't roll your own Meta app
+
+**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic. Use Path A or Path B instead. The only safe DIY route is a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`) — budget weeks for review.
 
 ## Before You Start
 
@@ -61,13 +72,26 @@ Neither credential belongs in this repo's `.env` today. If you add either later,
 
 ### Step 1: Pull Revenue + Spend Data
 
-Fetch the revenue-to-source breakdown:
+**Primary call** — full-funnel attribution merging ad spend with sessions and revenue:
 
-- `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign breakdown
+- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+
+This returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions`, `revenue_conversions`, `revenue`, `roas`, `true_cpa`, plus `unmatched_ad_campaigns` (UTM hygiene gaps) and `unmatched_utm_campaigns` (organic/email traffic). Empty `campaigns[]` with non-empty `unmatched_*` is the strongest signal that UTM tagging needs work — the data is flowing, it just isn't joining.
+
+**Spend supplement (Path A — connectors connected):**
+
+- Meta: `GET /api/meta-connections?propertyId={propertyId}` → pick a connection → `GET /api/meta-connections/{id}/accounts/{accountId}/daily-insights?since=&until=`
+- Google: `GET /api/google-ads-connections?propertyId={propertyId}` → pick a connection → `GET /api/google-ads-connections/{id}/campaigns?customerId={customerId}`
+
+**Path A2 fallback (no connectors):** ask the user to paste a CSV from Ads Manager. The skill joins those rows to the `ads-attribution` revenue side.
+
+**Context endpoints** for source/page-level breakdowns:
+
+- `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions
 - `GET /properties/{propertyId}/forms/breakdown` — Conversion events (signups, purchases)
-- `GET /properties/{propertyId}/pages/breakdown?page_group=stripe` or revenue endpoints for Stripe-linked revenue
+- `GET /properties/{propertyId}/pages/breakdown` — Page performance (the public API doesn't expose a `page_group` filter; pull all pages and filter client-side if needed)
 
-Combine with **ad spend data** (user provides from Meta Ads Manager, Google Ads, etc.) to calculate true ROAS per campaign.
+All endpoints accept the same Bearer `HUMBLYTICS_API_KEY`.
 
 ### Step 2: Build the Attribution Table
 
@@ -167,6 +191,15 @@ TRACKING GAPS:
 3. **Kill slowly, scale cautiously.** A low ROAS campaign might be the top-funnel driver. Check assisted conversions before killing.
 4. **UTM hygiene is everything.** Without clean UTMs, attribution is fiction. Fix tracking before fixing spend.
 5. **Blended CAC is the truth.** Per-campaign ROAS is useful, but blended CAC tells you whether the business model works.
+
+## Creative Inspection (Path A only)
+
+When `ads-attribution` flags a high-spend / low-revenue Meta campaign, drill into the underlying creative before recommending kill:
+
+- `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — list ads in the campaign with creative + destination URL
+- `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata for one ad
+
+Look for: destination URL mismatch (ad copy promises X, lands on Y), broken links, low-quality stock visuals, or one ad in the campaign hogging the spend with poor performance. This is the read-only diagnostic step. To pause the ad, hand off to Meta CLI (Path B).
 
 ## Related Skills
 

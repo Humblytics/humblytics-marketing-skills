@@ -1,4 +1,4 @@
-# AI Marketing Skills
+# Humblytics Marketing Skills
 
 A collection of CRO and marketing agent skills for AI coding assistants. Built for the [Humblytics](https://humblytics.com) analytics platform and following the [Agent Skills](https://agentskills.io) specification.
 
@@ -36,7 +36,7 @@ Add this repository as a skill source in your Claude Code configuration:
 
 ```bash
 # Clone the repo
-git clone https://github.com/nicholasmorgan/ai-marketing-skills.git
+git clone https://github.com/Humblytics/humblytics-marketing-skills.git
 
 # Or reference skills directly in your project's AGENTS.md
 ```
@@ -54,19 +54,28 @@ Several skills connect to the Humblytics API for live data. Before using them:
 3. Fill in `HUMBLYTICS_API_KEY` (and optionally `HUMBLYTICS_PROPERTY_ID`) in `.env`
 4. Load it into your shell before running the agent: `source .env` (or use `direnv`, or add the exports to your shell profile)
 
-The `.env` file is gitignored by convention — **never commit it**, and **never paste API keys directly into the agent chat**. Skills read credentials from the environment; that's the only safe path.
+The `.env` file is gitignored by convention — **never commit it**, and **never paste API keys directly into the agent chat**. Keep `HUMBLYTICS_API_KEY` out of `CLAUDE.md`, `.cursorrules`, and any file that gets committed to git. Skills read credentials from the environment; that's the only safe path.
+
+The same property-scoped Bearer key authorizes all three API bases:
+- `https://app.humblytics.com/api/external/v1` — traffic, pages, forms, clicks, funnels, split tests
+- `https://app.humblytics.com/api/v1` — ads-attribution
+- `https://app.humblytics.com/api` — meta-connections, google-ads-connections
 
 See the [Humblytics Agent Documentation](https://app.humblytics.com/agent.md) for the full API reference.
 
-### Meta Ads and Google Ads
+### Meta Ads and Google Ads — three paths
 
-None of the skills in this repo call Meta Ads or Google Ads APIs directly. `revenue-attributor` asks you to paste spend data from your Ads Manager dashboards and pairs it with Humblytics attribution — no Meta App Review or Google Ads developer token required.
+#### Path A — Humblytics connectors (preferred, read-only)
 
-**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic.
+Connect Meta Ads and Google Ads once at **Connectors** in the Humblytics dashboard. Skills then read campaign metadata, daily insights, ad creative, and full-funnel revenue attribution through Humblytics' managed connections — using the same `HUMBLYTICS_API_KEY` you already set up. No Meta App Review, no Google Ads developer token. `revenue-attributor` and `ad-expert` use this path by default. **Read-only** — connectors don't let agents pause campaigns or change budgets.
 
-If you want to automate ad-spend ingestion later, it is out of scope for this repo and requires real platform setup:
-- **Meta Ads**: a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`). Draft/unpublished apps pulling production data is the exact pattern being banned. Budget weeks for review.
-- **Google Ads**: a Google Ads developer token (Basic for low-volume, Standard for production), OAuth on a manager account, and the developer token attached to every request.
+#### Path B — Meta CLI (read + write)
+
+When the agent needs to *manage* campaigns (pause laggards, shift budget), use Meta's official `meta ads` CLI (released April 29, 2026). It's a published, supported tool that creates resources in `PAUSED` status by default. Scope the access token to a single ad account, store it in `.env` (never `CLAUDE.md`), and review every campaign before flipping it active. Skills hand off to the CLI for write actions; they don't call it directly.
+
+#### Path C — Don't roll your own
+
+**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic. Use Path A or Path B above. The only safe DIY route is a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`) — budget weeks for review.
 
 ## Security
 

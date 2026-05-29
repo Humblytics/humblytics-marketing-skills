@@ -55,11 +55,15 @@ Retrieve analytics data from the Humblytics API:
 - **Device and source breakdowns** to identify segment-specific issues
 - **Heatmap summaries** if available for high-traffic pages
 
-Use the Humblytics API endpoints:
-- `GET /properties/{propertyId}/analytics/pages` — Page-level traffic
-- `GET /properties/{propertyId}/analytics/funnel` — Funnel step data
-- `GET /properties/{propertyId}/analytics/events` — Custom event tracking
-- `GET /properties/{propertyId}/heatmaps` — Click and scroll heatmap data
+Use the Humblytics public API endpoints. All sit under base `/api/external/v1/` and take `start`, `end`, `timezone` query params:
+
+- `GET /properties/{propertyId}/pages/breakdown` — Page-level traffic across the site
+- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country breakdowns, scroll depth)
+- `GET /properties/{propertyId}/funnels?steps={JSON}` — Funnel step data; the `steps` param is a JSON array describing each step. Optional: `mode=unbounded|sequential`, `breakdownBy`
+- `GET /properties/{propertyId}/funnels/sankey?steps={JSON}` — Sankey path diagram for the same funnel
+- `GET /properties/{propertyId}/forms/breakdown` and `forms/details?page=/path` — Form/conversion event data (the public API doesn't expose a generic `events` endpoint)
+- `GET /properties/{propertyId}/clicks/details?page=/path` — Click heatmap data for a specific page (no top-level `/heatmaps` endpoint exists; click data is the closest analogue)
+- `GET /properties/{propertyId}/clicks/breakdown` — Cross-page click comparison
 
 ### Step 2: Map the Funnel
 
@@ -95,6 +99,8 @@ For each high-drop-off step, investigate:
 - **Scroll depth** — Are users seeing the CTA? Check heatmap scroll data.
 - **Click patterns** — Are users clicking non-interactive elements? Confusing UI.
 - **Form fields** — For forms, which field has the highest abandonment rate?
+
+When the leak appears concentrated in **paid traffic** (drop-off significantly worse for `utm_source=google` or `utm_source=facebook` than for organic), pull `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=&endDate=` to see which specific campaigns are landing on the underperforming page. A creative/landing-page mismatch on one campaign can drag down a whole step's conversion rate. Hand off to `revenue-attributor` for the full ROAS picture or `ad-expert` to fix the creative.
 
 ### Step 5: Generate Test Hypotheses
 
@@ -171,3 +177,15 @@ Present findings as:
 - **funnel-reporter** — Pull comprehensive funnel reports with revenue data
 - **page-cro** — Deep-dive into a specific page's conversion issues
 - **copywriting** — Generate optimized copy for test variants
+
+## Shared Frameworks (REQUIRED reading)
+
+Before producing recommendations, anchor your analysis against the shared primitives in `skills/_shared/`. Skipping these is the #1 cause of generic, low-confidence output.
+
+- **`_shared/frameworks/preflight-checklist.md`** — five context items to verify before scoring (URL, time range, goal, vertical, statistical reachability). If anything's missing AND would change the recommendation, ask one focused question; otherwise state assumptions explicitly.
+- **`_shared/frameworks/largest-leak-first.md`** — rank by absolute people lost, not by percentage drop. A 10% drop on 10,000 visitors outranks a 50% drop on 100. Always compute absolute loss per step before applying ICE.
+- **`_shared/frameworks/percentile-framing.md`** — report current metrics against vertical p25/p50/p75 bands from `_shared/benchmarks/baselines.json`. Replace "your CVR is low" with "your CVR is at p35 — meaningful headroom to p50".
+- **`_shared/frameworks/ice-confidence-rubric.md`** — anchor ICE.Confidence on evidence quality, not familiarity. 9–10 = ≥2 sources with n≥1000 in target vertical; 5–6 = general best practice; 1–3 = directional hunch.
+- **`_shared/frameworks/anti-patterns.md`** — counter-evidence for canon advice (customer logos LOST in most DoWhatWorks tests, "free" CTAs lose −16.8% platform-wide on Unbounce, hero video net-negative on mobile, etc.). Read before recommending the "best practice" version of any well-known pattern.
+- **`_shared/frameworks/base-rate-priors.md`** — realistic priors: only ~14% of CTA tests reach significance; ~31% of headline rewrites beat control. Anchor expectations against base rates, not best-case outliers.
+- **`_shared/benchmarks/patterns.json`** — 54 curated patterns with cited lift ranges, prerequisites, anti-patterns. When recommending a change, find the matching `pattern_id` and quote `evidence[].lift_range_pct` instead of guessing.

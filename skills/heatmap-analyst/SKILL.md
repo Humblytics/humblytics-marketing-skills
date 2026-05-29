@@ -147,3 +147,14 @@ SUGGESTED A/B TESTS:
 - `cro-optimizer` — Combines heatmap findings with funnel data for holistic CRO
 - `page-cro` — Full 10-point page audit; heatmap analysis is one dimension
 - `ab-test-generator` — Takes heatmap recommendations and launches them as tests
+
+## Shared Frameworks (REQUIRED reading)
+
+Heatmap interpretation is highly context-dependent. The shared primitives in `skills/_shared/` keep recommendations grounded.
+
+- **`_shared/frameworks/preflight-checklist.md`** — confirm minimum 500 sessions per page-period combo before drawing conclusions. Heatmap patterns on smaller samples are noise.
+- **`_shared/frameworks/anti-patterns.md`** — heatmap-relevant counter-evidence:
+  - **Mobile hamburger menu**: NN/g says it hurts discoverability on task-oriented SaaS (Spotify hamburger → bottom-tab = +30% menu interactions). **BUT** Amazon's hamburger beat dropdown for browse-heavy ecom. Site_type is load-bearing — don't recommend bottom-tab universally.
+  - **Mobile exit-intent**: architecturally broken (no cursor → no mouseleave event). If heatmap shows users leaving on mobile, the answer is not an exit modal.
+  - **Progress-bar velocity**: NIH RCT shows slow-to-fast progress bars nearly double form abandonment. If your heatmap shows form-step drop-off, audit progress bar acceleration before redesigning fields.
+- **`_shared/benchmarks/patterns.json`** — when heatmap data confirms a problem (e.g., low scroll past 30%, CTA clicks dominated by a single variant), match to a `pattern_id` and quote the evidence-backed lift range for the fix. Most relevant categories: `cta`, `navigation`, `above_fold`.

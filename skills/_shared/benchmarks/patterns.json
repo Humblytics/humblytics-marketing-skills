@@ -1,0 +1,2534 @@
+{
+  "_meta": {
+    "version": 1,
+    "schema": "patterns.json v1",
+    "last_updated": "2026-05-13",
+    "source": "Curated from Perplexity research Batch 1 — see research/raw/*.md for source responses",
+    "patterns_count": 54,
+    "status": "active_v2",
+    "batch": "batches_1_2_3",
+    "promoted_at": "2026-05-13"
+  },
+  "patterns": [
+    {
+      "pattern_id": "testimonial_above_cta",
+      "category": "social_proof",
+      "description": "Peer-similar customer testimonial (name + photo + company + quantified result) placed adjacent to or directly above the primary CTA on landing or pricing pages.",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "VWO / WikiJobs case study",
+          "lift_range_pct": [
+            30,
+            35
+          ],
+          "confidence": "high",
+          "vertical": "lead_gen",
+          "year": 2023,
+          "url": "https://help.vwo.com/hc/en-us/articles/49383512647961"
+        },
+        {
+          "source": "Mutiny / UserEvidence",
+          "lift_range_pct": [
+            35,
+            35
+          ],
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://userevidence.com/blog/how-to-increase-your-landing-page-conversions-by-adding-3-types-of-social-proof/"
+        },
+        {
+          "source": "SaaS Hero hero-CTA analysis",
+          "sample_size": 2000,
+          "lift_range_pct": [
+            20,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://www.saashero.net/design/b2b-saas-landing-cta-practices/"
+        },
+        {
+          "source": "InfluenceFlow pricing-page visible social proof",
+          "lift_range_pct": [
+            15,
+            25
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024
+        }
+      ],
+      "prerequisites": [
+        "Testimonial includes real name, photo, company, and specific quantified result",
+        "Audience industry/company-size matches testimonial source",
+        "Recent (within ~18 months) — avoid 2021-2022 dated proof",
+        "Mobile-stacked vertically, readable without horizontal scroll",
+        "Page targets high-intent traffic (competitor comparison, pricing searches)"
+      ],
+      "anti_patterns": [
+        "Generic polished testimonials (\"absolutely perfect\")",
+        "Stock photo + generic name combinations",
+        "Anonymized \"a satisfied customer\" framing",
+        "Dissonant quotes across multiple testimonials (one says \"easy\", another says \"took weeks\")",
+        "Mobile horizontal-scrolling carousels"
+      ],
+      "references_visual": [],
+      "notes": "Typical median lift +30-35%. Strongest when audience-matched and quantified. Effect is robust across multiple replications (VWO, Mutiny)."
+    },
+    {
+      "pattern_id": "customer_logos_landing",
+      "category": "social_proof",
+      "description": "Row of recognizable customer logos placed above the fold or near primary CTA on landing/pricing pages to signal credibility.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "SaaS Hero B2B landing-page analysis",
+          "sample_size": 2000,
+          "lift_range_pct": [
+            20,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://www.saashero.net/design/landing-page-design-trust-signals/"
+        },
+        {
+          "source": "Docsend (enterprise→enterprise, audience-matched)",
+          "lift_range_pct": [
+            260,
+            260
+          ],
+          "confidence": "low",
+          "vertical": "saas",
+          "year": 2022,
+          "notes": "Context-specific outlier — single dramatic enterprise case, do not generalize."
+        },
+        {
+          "source": "DoWhatWorks aggregate (Dropbox, Jotform, Navan)",
+          "lift_range_pct": [
+            -15,
+            5
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://www.dowhatworks.io/blog/the-problem-with-social-proof",
+          "notes": "Customer logos LOST in most A/B tests when prerequisites unmet."
+        }
+      ],
+      "prerequisites": [
+        "Logo recognition matches prospect's segment (enterprise prospects see enterprise logos)",
+        "Logos represent active, recognizable brands in the buyer's market",
+        "Limited to ~5-8 highest-recognition logos, not a 30-logo wall"
+      ],
+      "anti_patterns": [
+        "Mismatched segment (SMB logos shown to enterprise prospects = anti-proof)",
+        "Low-recognition logos chosen for quantity over recognition",
+        "Logos placed in footer, far from CTA",
+        "Treating logo strip as universal best practice without prerequisite check"
+      ],
+      "references_visual": [],
+      "notes": "High variance. DoWhatWorks finding (Dropbox, Jotform, Navan all LOST with logos) is the load-bearing caveat — agent should warn that the default outcome is null-to-negative unless audience-segment match is verified. Docsend +260% is a context-specific outlier (enterprise selling to enterprise)."
+    },
+    {
+      "pattern_id": "real_time_activity_notifications",
+      "category": "social_proof",
+      "description": "Live activity notifications (\"X just signed up\", \"X viewing now\") displayed near the CTA on landing or product pages.",
+      "applies_to": [
+        "landing",
+        "product",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "ProveSource aggregate",
+          "lift_range_pct": [
+            10,
+            15
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024
+        },
+        {
+          "source": "Tryflint synthesis (best-case real-time vs static)",
+          "lift_range_pct": [
+            10,
+            98
+          ],
+          "confidence": "low",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "url": "https://www.tryflint.com/blog/landing-page-social-proof-element-performance-statistics",
+          "notes": "98% is best-case upper bound, not typical."
+        }
+      ],
+      "prerequisites": [
+        "Notifications reflect real, recent activity (not synthetic)",
+        "Specific numerical claims (\"23 just purchased\") not vague (\"many people\")",
+        "Update granularity matches plausible site traffic — round numbers backfire",
+        "Notifications do not obscure CTA on mobile"
+      ],
+      "anti_patterns": [
+        "Fabricated or static \"X people viewing\" counters that never change",
+        "Round implausible numbers (\"100 people viewing now\")",
+        "Notifications that obscure form fields or CTAs on mobile",
+        "Deploying on low-traffic sites where activity claims are obviously implausible"
+      ],
+      "references_visual": [],
+      "notes": "Typical lift +10-15%. Authenticity is the load-bearing prerequisite — fake real-time backfires by transferring distrust to the entire page."
+    },
+    {
+      "pattern_id": "video_testimonial_above_fold",
+      "category": "social_proof",
+      "description": "Customer video testimonial elevated above the fold or above primary CTA, instead of text-only.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "InfluenceFlow / Tryflint synthesis",
+          "lift_range_pct": [
+            60,
+            80
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024
+        },
+        {
+          "source": "Video CVR study (3.91% → 6.38%)",
+          "lift_range_pct": [
+            63,
+            63
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024
+        }
+      ],
+      "prerequisites": [
+        "Real customer (not actor)",
+        "Autoplay muted with captions for mobile",
+        "≤90 seconds with clear quantified outcome",
+        "Production quality high enough to feel credible, not so polished it feels staged"
+      ],
+      "anti_patterns": [
+        "Auto-playing audio (violates mobile UX, browser policies)",
+        "Heavy video files that delay page load >1s (each 1s mobile delay = ~20% CVR drop)",
+        "Generic spokesperson video instead of customer"
+      ],
+      "references_visual": [],
+      "notes": "Larger lift than text testimonials but technically more expensive to produce and instrument. Test mobile load impact before shipping."
+    },
+    {
+      "pattern_id": "form_field_reduction_lead_gen",
+      "category": "form",
+      "description": "Reduce a 7+ field lead-gen or signup form to 3-5 essential fields, using enrichment or progressive profiling for the rest.",
+      "applies_to": [
+        "signup",
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Imaginary Landscape (11→4 fields)",
+          "lift_range_pct": [
+            120,
+            120
+          ],
+          "confidence": "high",
+          "vertical": "lead_gen",
+          "year": 2008,
+          "url": "https://www.imagescape.com/media/filer_public/06/94/0694c7f4-8914-4598-8871-b857fbc12737/form_case_study.pdf",
+          "notes": "Foundational ceiling case, not median."
+        },
+        {
+          "source": "Clearbit + Marketo (Gong demo form)",
+          "lift_range_pct": [
+            50,
+            70
+          ],
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2022,
+          "url": "https://clearbit.com/resources/guides/Adobe-Marketo-improve-form-conversion-rates"
+        },
+        {
+          "source": "Optimizely B2B SaaS landing page",
+          "lift_range_pct": [
+            47,
+            47
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "url": "https://www.optimizely.com/insights/blog/experimentation-use-cases-software-b2b-landing-page/",
+          "notes": "Bundled with visual change; 99% sig."
+        },
+        {
+          "source": "Marketo rule-of-thumb (per field removed)",
+          "lift_range_pct": [
+            3,
+            5
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2021
+        }
+      ],
+      "prerequisites": [
+        "Baseline form has 7+ fields",
+        "Removed fields are non-essential (validated via user research/session analysis)",
+        "Downstream system can recover removed data via enrichment (Clearbit, ZoomInfo) or progressive profiling",
+        "Sales/ops capacity matches resulting lead volume",
+        "Remaining fields use correct mobile input types (type=tel, type=email)"
+      ],
+      "anti_patterns": [
+        "Removing fields users WANT to fill (Aagaard -14% — most cited failure mode)",
+        "Cutting qualification fields when sales has limited capacity (volume up, revenue conversion down)",
+        "Going below 3 fields on high-ticket B2B demo without enrichment backend",
+        "Treating field count as the only lever — copy/label work can match or exceed reduction lift"
+      ],
+      "references_visual": [],
+      "notes": "Typical defensible lift +20-70%. Do not quote the 2008 Imaginary Landscape +120% as headline — it's the ceiling. Below ~4 fields, returns saturate. Mobile lift amplifier — expect bigger gains on mobile-heavy traffic."
+    },
+    {
+      "pattern_id": "form_field_reduction_checkout",
+      "category": "form",
+      "description": "Trim ecommerce checkout from the industry-average ~11 fields toward Baymard's 8-field optimum via address autocomplete, hiding optional fields, and removing redundant company-name etc.",
+      "applies_to": [
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Baymard Institute (decade of checkout usability testing)",
+          "lift_range_pct": [
+            10,
+            35
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "url": "https://baymard.com/blog/checkout-flow-average-form-fields",
+          "notes": "+35.26% is bundled checkout-usability ceiling, not field-reduction alone."
+        }
+      ],
+      "prerequisites": [
+        "Address-lookup / autocomplete integration",
+        "Differentiated billing/shipping checkbox (default-on)",
+        "Correct mobile input types",
+        "Optional fields hidden by default"
+      ],
+      "anti_patterns": [
+        "Removing fields needed for tax/shipping logic",
+        "Over-collapsing on mobile such that errors become harder to recover",
+        "Hidden required fields revealed late in flow"
+      ],
+      "references_visual": [],
+      "notes": "Target the Baymard 8-field number rather than a fixed % lift. Industry average is ~11.3 fields across 5.1 steps; ~40% are bloat."
+    },
+    {
+      "pattern_id": "form_field_label_optimization",
+      "category": "form",
+      "description": "When form fields cannot be removed (qualification, high-intent demo), optimize labels, helper copy, and field ordering instead of cutting count.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Michael Aagaard / Unbounce (2nd treatment)",
+          "lift_range_pct": [
+            19,
+            19
+          ],
+          "confidence": "high",
+          "vertical": "lead_gen",
+          "year": 2014
+        }
+      ],
+      "prerequisites": [
+        "Fields are user-valued (cutting them would hurt — see Aagaard -14%)",
+        "Labels and helper text reviewed for clarity/friction",
+        "Inline validation present"
+      ],
+      "anti_patterns": [
+        "Cutting valued fields blindly (Aagaard -14% failure mode)",
+        "Generic placeholder-only labels"
+      ],
+      "references_visual": [],
+      "notes": "Counter-pattern to field reduction. Use when fields are genuinely needed for qualification."
+    },
+    {
+      "pattern_id": "anchor_pricing_middle_tier_highlight",
+      "category": "pricing",
+      "description": "Three-tier pricing layout with the middle (recommended) tier in center position, visually emphasized via color/badge/size and outcome-based naming.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Design Revision SaaS pricing analysis (center-stage + emphasis)",
+          "lift_range_pct": [
+            38,
+            38
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "url": "https://designrevision.com/blog/saas-pricing-page-design",
+          "notes": "Most-cited number, no published full methodology — directional."
+        },
+        {
+          "source": "Optimizely (Basecamp annual-plan prominence)",
+          "lift_range_pct": [
+            14,
+            14
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2020,
+          "url": "https://www.optimizely.com/insights/blog/how-to-optimize-pricing-page/"
+        },
+        {
+          "source": "Pricing comparison tables (multiple sources)",
+          "lift_range_pct": [
+            15,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "Necessary scaffolding for anchoring to work."
+        }
+      ],
+      "prerequisites": [
+        "Exactly three tiers (4+ triggers paralysis, 2 defaults to cheaper)",
+        "Center-stage positioning of the recommended tier",
+        "Visual emphasis: color, size, badge (\"Most Popular\" / \"Recommended\")",
+        "Outcome-based tier naming (Starter / Growth / Scale) > size-based (Small / Medium / Large)",
+        "Scannable feature comparison table with checkmarks, category-grouped",
+        "Transparent pricing visible per tier — no fully hidden enterprise without anchor",
+        "Mobile-first vertical stack that preserves visual emphasis"
+      ],
+      "anti_patterns": [
+        "Tier proliferation (4+, see pricing_tier_proliferation)",
+        "Center tier without visual emphasis (wastes the position)",
+        "Visual emphasis without center positioning (wastes the emphasis)",
+        "Hidden \"Contact Sales\" enterprise tier with zero anchor",
+        "Horizontal-tab plan selectors on mobile (kills comparability)",
+        "Size-based tier names (\"Small/Medium/Large\")"
+      ],
+      "references_visual": [],
+      "notes": "Mechanism (Ariely compromise effect) is high-confidence; published effect sizes (+30-38%) are widely repeated but lack independent RCT replication. No public direct 1-tier vs 3-tier A/B test was located. Defensible lift_range_pct is [15, 38] with strong prerequisite dependence."
+    },
+    {
+      "pattern_id": "decoy_pricing_tier_top",
+      "category": "pricing",
+      "description": "Top pricing tier engineered as a decoy (asymmetric dominance) so the target middle tier appears as the rational compromise.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "ConversionXL aggregate",
+          "lift_range_pct": [
+            13,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023
+        },
+        {
+          "source": "Price Intelligently (decoy + company-size segmentation)",
+          "lift_range_pct": [
+            20,
+            20
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2022,
+          "notes": "ARPU lift, not raw CVR."
+        },
+        {
+          "source": "Ariely / Economist study (mechanism evidence)",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2008,
+          "url": "https://www.youtube.com/watch?v=xOhb4LwAaJk",
+          "notes": "Foundational behavioral econ — mechanism, not B2B CVR."
+        }
+      ],
+      "prerequisites": [
+        "Decoy top tier close enough in price to invite comparison",
+        "Decoy clearly inferior in value for the target customer, but still legitimate-looking",
+        "Meaningful price ratios between all three tiers",
+        "B2B-finance-team-safe framing (decoy must not look manipulative under procurement scrutiny)"
+      ],
+      "anti_patterns": [
+        "Obvious / manipulative decoy that finance teams flag → trust erosion",
+        "Decoy too inferior — looks like obvious manipulation",
+        "Decoy too similar to target — fails to make target look optimal"
+      ],
+      "references_visual": [],
+      "notes": "Distinct from compromise-effect anchoring (asymmetric dominance vs midpoint pull). Carries brand-trust downside in B2B procurement contexts; co-occurs with anchor_pricing_middle_tier_highlight in practice."
+    },
+    {
+      "pattern_id": "pricing_tier_proliferation",
+      "category": "pricing",
+      "description": "Anti-pattern: 4+ pricing tiers triggering choice paralysis and reducing conversion.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Pricing-page choice-paralysis synthesis (CXL, Design Revision)",
+          "lift_range_pct": [
+            -18,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Adding tiers to capture every segment instead of using usage-based add-ons",
+        "Splitting features across 5+ columns to differentiate",
+        "Updating tiers ad-hoc reacting to competitors without A/B rigor"
+      ],
+      "references_visual": [],
+      "notes": "Anti-pattern entry. Agent should warn against 4+ tier layouts and recommend consolidating to 3 with add-ons or usage-based scaling."
+    },
+    {
+      "pattern_id": "sticky_cta_desktop_longform",
+      "category": "above_fold",
+      "description": "Persistent / sticky primary CTA on long-form B2B SaaS landing pages or ecommerce product detail pages (desktop).",
+      "applies_to": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "GrowthRock (supplement ecommerce, ~2000 conv/variation, 99% sig)",
+          "sample_size": 2000,
+          "lift_range_pct": [
+            7.9,
+            7.9
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://growthrock.co/sticky-add-to-cart-button-example/"
+        },
+        {
+          "source": "GoodUI Pattern #41",
+          "sample_size": 310981,
+          "lift_range_pct": [
+            7.1,
+            7.1
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2022,
+          "url": "https://goodui.org/patterns/41/"
+        },
+        {
+          "source": "GoodUI Pattern #41 (larger replication)",
+          "sample_size": 805623,
+          "lift_range_pct": [
+            16.5,
+            16.5
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2023,
+          "url": "https://goodui.org/patterns/41/"
+        },
+        {
+          "source": "Conversion Rate Experts (long-form B2B + copy work)",
+          "lift_range_pct": [
+            22,
+            25
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2022,
+          "url": "https://conversion-rate-experts.com/sticky-cta-win-report/",
+          "notes": "Bundles copy optimization with stickiness."
+        }
+      ],
+      "prerequisites": [
+        "Page is long enough that users scroll past primary CTA",
+        "Specific copy on sticky CTA (\"Start my free 30-day trial\" beats \"Get Started\")",
+        "Single primary sticky CTA — no competing stickies",
+        "Layout reservation prevents CLS or hero/pricing occlusion",
+        "Distinct visual treatment from nav and other UI"
+      ],
+      "anti_patterns": [
+        "Generic \"Get Started\" / \"Learn More\" on persistent element",
+        "Multiple competing stickies (nav + CTA + chat + banner)",
+        "Sticky on short above-fold pages where users don't need it",
+        "Sticky elements obscuring pricing tables or hero content"
+      ],
+      "references_visual": [],
+      "notes": "Median defensible lift ~+8-10%. Conversion Rate Experts' +25% bundles copy work. Use GrowthRock + GoodUI median as the headline."
+    },
+    {
+      "pattern_id": "sticky_cta_mobile_drawer",
+      "category": "above_fold",
+      "description": "Drawer / slide-up sticky CTA on mobile that changes the interaction model (not just a button that scrolls to in-page CTA).",
+      "applies_to": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "GrowthRock mobile drawer (~3000 conv/variation, 98% sig)",
+          "sample_size": 3000,
+          "lift_range_pct": [
+            5.2,
+            5.2
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://growthrock.co/sticky-add-to-cart-button-example/"
+        }
+      ],
+      "prerequisites": [
+        "Drawer / slide-up interaction model — reduces taps-to-purchase",
+        "Use dynamic viewport height (dvh) so on-screen keyboard doesn't occlude",
+        "Single sticky CTA only",
+        "Sticky element ≤12% of mobile viewport"
+      ],
+      "anti_patterns": [
+        "Sticky button that only scrolls to in-page CTA (GrowthRock variation B = null)",
+        "Bottom-pinned CTA occluding form inputs when keyboard appears",
+        "Heavy sticky bars eating viewport"
+      ],
+      "references_visual": [],
+      "notes": "Interaction-model change is load-bearing — persistence alone failed in GrowthRock variation B. Mobile null on naive sticky is the most important caveat in this pattern family."
+    },
+    {
+      "pattern_id": "sticky_cta_mobile_anchor_naive",
+      "category": "above_fold",
+      "description": "Anti-pattern: mobile sticky CTA that merely scrolls to an existing in-page CTA without reducing taps-to-purchase.",
+      "applies_to": [
+        "landing",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "GrowthRock Variation B (~3000 conv/variation)",
+          "sample_size": 3000,
+          "lift_range_pct": [
+            -2,
+            2
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://growthrock.co/sticky-add-to-cart-button-example/",
+          "notes": "Explicitly null result — visibility without interaction-model change."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Treating mobile sticky as a free win without re-engineering the interaction",
+        "Same desktop sticky pattern ported to mobile"
+      ],
+      "references_visual": [],
+      "notes": "Explicit null entry. Agent should warn when team proposes shipping a sticky button that just anchors-scrolls."
+    },
+    {
+      "pattern_id": "trust_badge_security_seal_ecommerce",
+      "category": "trust_signal",
+      "description": "Security / SSL seal (Norton, VeriSign, PayPal) placed adjacent to credit-card field or checkout button on B2C ecommerce checkout.",
+      "applies_to": [
+        "checkout",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Blue Fountain Media VeriSign on signup form",
+          "lift_range_pct": [
+            42,
+            42
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2015,
+          "notes": "Single case, sample size not disclosed."
+        },
+        {
+          "source": "PayPal / Nielsen enterprise checkout",
+          "lift_range_pct": [
+            33,
+            33
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2018,
+          "url": "https://www.paypalobjects.com/digitalassets/c/website/marketing/global/shared/global/media-resources/documents/comScore_Checkout_Conversion_4-23-8.pdf"
+        },
+        {
+          "source": "PayPal Express (Comcore, n=20 merchants)",
+          "sample_size": 20,
+          "lift_range_pct": [
+            47,
+            47
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2018
+        },
+        {
+          "source": "ConversionTeam Norton (high-value digital)",
+          "lift_range_pct": [
+            12,
+            17
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2020,
+          "url": "https://www.conversionteam.com/case-studies/simple-trust-badge-test-delivers-12-2-conversion-rate-boost/"
+        },
+        {
+          "source": "McAfee Hacker Safe split-test (n=100k+)",
+          "sample_size": 100000,
+          "lift_range_pct": [
+            4,
+            6
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2019,
+          "url": "https://www.elasticpath.com/blog/mcafee-secure-conversion"
+        }
+      ],
+      "prerequisites": [
+        "Transaction risk justifies trust anxiety (high-value, financial, healthcare, regulated)",
+        "Badge placed adjacent to friction point (credit-card field / checkout button) — NOT footer",
+        "Badge brand has audience recognition (Norton, PayPal, BBB dominate)",
+        "Mobile load impact minimal — badges should not delay LCP"
+      ],
+      "anti_patterns": [
+        "Badges on low-risk, low-value transactions (negligible lift)",
+        "Footer-only placement",
+        "Static images of badges with no underlying verification when industry expects live verification"
+      ],
+      "references_visual": [],
+      "notes": "Effects have decayed ~30-50% from peak historical highs as web-wide habituation increased. Discount older case studies (pre-2020) accordingly for current expectations."
+    },
+    {
+      "pattern_id": "trust_badge_branded_seal_recognition",
+      "category": "trust_signal",
+      "description": "Use the badge brand that consumers recognize (Norton) over technically equivalent but unfamiliar alternatives (Thawte, GeoTrust).",
+      "applies_to": [
+        "checkout",
+        "signup",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Baymard longitudinal (2013-2023, n>1000/wave × 5 waves)",
+          "sample_size": 5000,
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://baymard.com/blog/perceived-security-of-payment-form",
+          "notes": "Norton perceived ~20x more trustworthy than Thawte/GeoTrust despite identical underlying tech (all DigiCert-owned)."
+        }
+      ],
+      "prerequisites": [
+        "Audience-recognized badge brand (Norton, PayPal, Google, BBB)",
+        "Avoid obscure CAs even when technically equivalent"
+      ],
+      "anti_patterns": [
+        "Choosing the cheapest SSL cert and assuming any badge is equivalent",
+        "Recommending generic \"an SSL badge\" without specifying brand"
+      ],
+      "references_visual": [],
+      "notes": "Single most replicated finding in the trust-badge literature: brand RECOGNITION drives perceived trust far more than actual technical security. Agents recommending trust badges should always specify the badge brand."
+    },
+    {
+      "pattern_id": "trust_badge_homemade_padlock",
+      "category": "trust_signal",
+      "description": "Plain padlock / lock icon designed in-house (no third-party CA seal) placed near payment fields.",
+      "applies_to": [
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Baymard Institute longitudinal",
+          "lift_range_pct": null,
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://baymard.com/blog/perceived-security-of-payment-form",
+          "notes": "Homemade padlock icons outperformed most real SSL seals (Thawte, GeoTrust, Comodo) in perceived trust."
+        }
+      ],
+      "prerequisites": [
+        "Placed visibly near payment fields",
+        "Visual consistent with site design language",
+        "Underlying site is actually HTTPS (don't lie)"
+      ],
+      "anti_patterns": [
+        "Treating the visual lock as a substitute for real SSL"
+      ],
+      "references_visual": [],
+      "notes": "Surprising finding: visual placebos can outperform real (but unrecognized) certifications. Strong evidence that trust is a perception problem, not a technology problem."
+    },
+    {
+      "pattern_id": "trust_badge_proliferation",
+      "category": "trust_signal",
+      "description": "Anti-pattern: 10+ badges or footer-only badge placement signaling desperation and reducing trust.",
+      "applies_to": [
+        "checkout",
+        "signup",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Get Elastic / Venture Harbour synthesis",
+          "lift_range_pct": [
+            -10,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "url": "https://ventureharbour.com/7-best-practices-that-can-kill-your-conversion-rate/"
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "40-badge walls",
+        "Mismatched badge types (SOC2 to consumers, payment seals to enterprise IT buyers)",
+        "Expired / stale compliance badges",
+        "Footer relegation"
+      ],
+      "references_visual": [],
+      "notes": "Optimal density: 3-5 highest-recognition badges. More badges = more anxiety reminders without proportional trust gain."
+    },
+    {
+      "pattern_id": "compliance_badges_b2b_saas",
+      "category": "trust_signal",
+      "description": "Compliance certifications (SOC 2 Type II, GDPR, ISO 27001) displayed near CTA on B2B SaaS landing/pricing pages.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "SaaS Hero B2B landing trust signals",
+          "lift_range_pct": [
+            10,
+            20
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://www.saashero.net/design/landing-page-design-trust-signals/"
+        }
+      ],
+      "prerequisites": [
+        "Audience includes enterprise buyers who care about compliance",
+        "Certifications are current (not expired)",
+        "Page targets buyers in regulated industries or with security review processes"
+      ],
+      "anti_patterns": [
+        "Showing SOC 2 to SMB self-serve buyers who don't care",
+        "Bragging about expired certifications",
+        "Treating as a marginal CRO lever when it's really a market-access gate"
+      ],
+      "references_visual": [],
+      "notes": "Fundamentally different from aesthetic trust badges: SOC 2 / GDPR / ISO function as BINARY procurement gates. Without them, certain enterprise segments are inaccessible regardless of CVR. The 10-20% lift on landing pages is incidental to the bigger gating effect."
+    },
+    {
+      "pattern_id": "urgency_real_deadline_timer",
+      "category": "urgency",
+      "description": "Countdown timer tied to a genuine, verifiable termination deadline (flash sale end, end-of-promo, pricing change effective date).",
+      "applies_to": [
+        "pricing",
+        "checkout",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "Optimizely aggregate countdown timers",
+          "lift_range_pct": [
+            5,
+            15
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "notes": "Best verticals exceed 30%; poorly implemented show negative."
+        },
+        {
+          "source": "VWO published B2C case studies",
+          "lift_range_pct": [
+            8,
+            47
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024
+        },
+        {
+          "source": "CXL synthesis of well-designed urgency",
+          "lift_range_pct": [
+            5,
+            25
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024
+        }
+      ],
+      "prerequisites": [
+        "Deadline is real and actually terminates at stated time",
+        "Above-the-fold or adjacent-to-pricing placement",
+        "Moderate visual intensity (not flashing red)",
+        "B2C consumer context OR genuine B2B promo period",
+        "Complementary trust elements present so urgency reads informative not coercive"
+      ],
+      "anti_patterns": [
+        "B2B SaaS pricing-page countdowns aimed at buying committees (frequently backfire)",
+        "Sub-day timers on infinite-capacity digital products",
+        "Flashing-red anxiety-maximizing visuals (reactance)",
+        "Stacking with other urgency signals (timer + low-stock + viewer count)"
+      ],
+      "references_visual": [],
+      "notes": "B2C ecommerce typical lift +5-18%. Sub-24-hour windows outperform multi-day. B2B SaaS lift is mostly null or negative — only safe variant is genuine business-timed deadlines (implementation slots, beta cohorts with real cap, documented promo periods)."
+    },
+    {
+      "pattern_id": "scarcity_inventory_depletion_visual",
+      "category": "urgency",
+      "description": "\"Only X left\" / \"75% sold out\" displayed as a visual progress bar on product pages with genuine inventory tracking.",
+      "applies_to": [
+        "product",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "CRO synthesis (CXL, VWO, Optimizely)",
+          "lift_range_pct": [
+            8,
+            22
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "notes": "Strongest as visual progress bar vs plain text count."
+        }
+      ],
+      "prerequisites": [
+        "Real inventory system feeding the display",
+        "Category where stockouts are plausible (fashion, electronics, limited editions)",
+        "Counter updates consistent with documented purchasing activity"
+      ],
+      "anti_patterns": [
+        "\"Only X left\" where X never changes across sessions",
+        "Scarcity on infinite-capacity digital goods (SaaS, courses) — reactance",
+        "Static counters that are obviously fake"
+      ],
+      "references_visual": [],
+      "notes": "Category fit matters more than execution. Inappropriate for SaaS or digital downloads."
+    },
+    {
+      "pattern_id": "urgency_manufactured_perpetual",
+      "category": "urgency",
+      "description": "Anti-pattern: countdown timer that resets on page refresh, static \"low stock\" warnings, perpetual \"limited time\" banners.",
+      "applies_to": [
+        "pricing",
+        "checkout",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "Optimizely aggregate (non-trivial share of urgency A/B tests show NEGATIVE lift)",
+          "lift_range_pct": [
+            -25,
+            10
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024
+        },
+        {
+          "source": "LTV impact synthesis (CXL + Optimizely)",
+          "lift_range_pct": [
+            -40,
+            -15
+          ],
+          "confidence": "low",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "notes": "LTV reduction in detected-manipulation cases, not immediate CVR. Directional, magnitude uncertain."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Page-refresh-reset countdowns",
+        "Perpetual \"limited time\" banners running for months",
+        "Identical countdown shown to every visitor regardless of session time",
+        "B2B SaaS pricing-page countdowns",
+        "Round-number demand signals (\"100 viewing now\")",
+        "Stacking multiple urgency signals simultaneously"
+      ],
+      "references_visual": [],
+      "notes": "Load-bearing finding: short-term lift literature systematically under-counts LTV cost. Once a visitor detects fake urgency (e.g., by refreshing), they downgrade trust in ALL brand marketing claims. FTC enforcement precedent exists. Platform policies (Amazon, Google, Meta) restrict manipulative urgency. Agent should explicitly warn against deploying this pattern even when short-term A/B tests show positive lift."
+    },
+    {
+      "pattern_id": "headline_quantified_benefit",
+      "category": "headline",
+      "description": "Replace generic benefit headlines with quantified outcomes (e.g., 'Reduce sales cycle by 30%' instead of 'Accelerate your sales cycle'). Specificity establishes credibility and differentiation.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Practitioner canon synthesis (Copy Hackers, CXL, Harry Dry)",
+          "lift_range_pct": [
+            10,
+            50
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "Wide range — magnitude varies with audience awareness stage and quote credibility."
+        }
+      ],
+      "prerequisites": [
+        "Real, defensible number tied to a documented customer outcome",
+        "Proof element (case study, customer name, methodology) visible below the fold",
+        "Audience is solution-aware (Schwartz stage 3+) — quantified benefits land best when prospect already accepts the category",
+        "Mobile-truncation-safe (<=8 words for clean 2-line wrap at 375px)"
+      ],
+      "anti_patterns": [
+        "Inflated or unverifiable claims ('Increase revenue 47%' with no case study)",
+        "Quantified claims without proof below the fold = credibility loss",
+        "Generic aspirational headlines ('Take your business to the next level')"
+      ],
+      "references_visual": [],
+      "notes": "High theoretical support, thin isolated A/B evidence — most published wins bundle headline + supporting copy + image changes. Conservative defensible lift +10-20%. Pair with audience-qualified variant for compounding."
+    },
+    {
+      "pattern_id": "headline_audience_qualified",
+      "category": "headline",
+      "description": "Embed a role / segment / vertical qualifier in the H1 ('Built for CFOs in software companies', 'For Series A B2B SaaS') to increase perceived relevance for cold paid traffic.",
+      "applies_to": [
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Practitioner reports (CXL, Copy Hackers, Unbounce)",
+          "lift_range_pct": [
+            15,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024
+        },
+        {
+          "source": "Going / Unbounce state-specific variant test (26 variants)",
+          "lift_range_pct": [
+            52,
+            52
+          ],
+          "confidence": "low",
+          "vertical": "lead_gen",
+          "year": 2024,
+          "notes": "Bundled with below-fold form repositioning — directional only."
+        }
+      ],
+      "prerequisites": [
+        "Audience is distinguishable by role / vertical / company-size in incoming traffic (paid campaigns with intent signal)",
+        "Page targets a single ICP segment, not the whole TAM",
+        "Channel-to-headline message-match (ad copy aligns with H1)"
+      ],
+      "anti_patterns": [
+        "Exclusionary assumptive copy ('For teams that move fast') that creates unnecessary in/out-group friction",
+        "Generic aspirational targeting ('For ambitious companies')",
+        "Identical headline across all paid traffic sources with different awareness levels"
+      ],
+      "references_visual": [],
+      "notes": "Theoretically strong, empirically thin. Use as part of programmatic landing-page strategy (one variant per ICP)."
+    },
+    {
+      "pattern_id": "headline_clever_anti_pattern",
+      "category": "headline",
+      "description": "Anti-pattern: clever / wordplay / metaphor headlines that obscure what the product does ('Sync up your sales', 'Take the guesswork out of growth').",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Practitioner consensus (CXL, Copy Hackers, Harry Dry, Unbounce)",
+          "lift_range_pct": [
+            -30,
+            -5
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "Reliably observed negative effect; magnitude varies by audience awareness."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Wordplay that fails the 5-second clarity test",
+        "Jargon-heavy headlines ('omnichannel attribution modeling with ML-powered customer journey analytics')",
+        "Vague aspirational copy that communicates sentiment without specificity"
+      ],
+      "references_visual": [],
+      "notes": "Explicit anti-pattern. Agent should warn whenever the H1 doesn't communicate what the product DOES in a single read."
+    },
+    {
+      "pattern_id": "headline_ab_test_low_winner_rate",
+      "category": "headline",
+      "description": "CAUTION pattern: realistic A/B-test expectation for headline-only changes. Only ~31% of headline variants beat their control in published case data (GrowWithLess 73-test study); ~69% are flat or regressions.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "GrowWithLess 73-headline-test review",
+          "sample_size": 73,
+          "lift_range_pct": [
+            -20,
+            50
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://growwithless.com/headlines-ab-test-lessons/",
+          "notes": "Distribution of outcomes — 31% winners, 69% null/negative."
+        }
+      ],
+      "prerequisites": [
+        "Adequate sample size to detect 10-20% lifts (often 2000-5000 conversions/variant for B2B SaaS)",
+        "Run comprehensive hero rebuild (headline + subhead + image + CTA) rather than headline-only swap to improve odds"
+      ],
+      "anti_patterns": [
+        "Promising 50%+ lift from a single-variable headline change",
+        "Stopping headline iteration after one failed test — base rate is ~1 in 3 variants beats control"
+      ],
+      "references_visual": [],
+      "notes": "Meta-pattern. Agent should set realistic expectations when user proposes a 'headline test' — bundle changes for better odds, plan for multiple iterations."
+    },
+    {
+      "pattern_id": "multi_step_form_b2b_leadgen",
+      "category": "form",
+      "description": "Multi-step (2-3 steps) form for B2B lead-gen with 5-7 fields total, sensitive fields (email, phone) deferred to step 2+, with a visible accurate progress indicator.",
+      "applies_to": [
+        "signup",
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Digital Applied 2026 benchmarks (controlled multi-step vs single)",
+          "lift_range_pct": [
+            14,
+            21
+          ],
+          "confidence": "med",
+          "vertical": "lead_gen",
+          "year": 2026,
+          "url": "https://www.digitalapplied.com/blog/form-conversion-rate-benchmarks-2026-data-points"
+        },
+        {
+          "source": "Multi-step + visible progress indicator (vs no indicator)",
+          "lift_range_pct": [
+            27,
+            27
+          ],
+          "confidence": "med",
+          "vertical": "lead_gen",
+          "year": 2026
+        },
+        {
+          "source": "Vendio multi-step + progress A/B test",
+          "sample_size": 25500,
+          "lift_range_pct": [
+            18,
+            18
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2024
+        },
+        {
+          "source": "Advanced Grass case (3-field single → 7-field two-step)",
+          "lift_range_pct": [
+            214,
+            214
+          ],
+          "confidence": "low",
+          "vertical": "lead_gen",
+          "year": 2023,
+          "notes": "Single dramatic case study — ceiling, not median."
+        }
+      ],
+      "prerequisites": [
+        "Baseline form has ≥5 fields (3-field forms gain little from stepping)",
+        "Low-friction / non-sensitive fields on step 1; sensitive fields (email, phone, payment) on step 2+",
+        "2-3 steps maximum — 4+ kills gains",
+        "Visible, accurate progress indicator (no phantom skipped steps)",
+        "Desktop-majority or desktop-segmented traffic",
+        "Pre-filled first field or personalized greeting (NN/g: -23.4pp first-step abandonment)"
+      ],
+      "anti_patterns": [
+        "Same number of fields split across steps without sensitive-field deferral (architectural change without psychological payoff)",
+        "Sensitive fields (phone, payment) on step 1",
+        "4+ steps for forms <15 fields"
+      ],
+      "references_visual": [],
+      "notes": "Typical defensible lift +14-21%. Field reduction is a HIGHER-leverage lever than stepping — recommend 'reduce fields first, then consider stepping.'"
+    },
+    {
+      "pattern_id": "multi_step_form_mobile_simple_anti_pattern",
+      "category": "form",
+      "description": "Anti-pattern: porting a multi-step form to mobile-majority traffic on simple products. Page transitions add 2-4s perceived wait; mobile users abandon faster.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "BAMS / Reform.app mobile checkout analysis",
+          "lift_range_pct": [
+            -15,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "url": "https://www.bams.com/blog/mobile-checkout-optimization-single-vs-multi-step/"
+        },
+        {
+          "source": "Reform.app mobile vs desktop form benchmarks",
+          "lift_range_pct": [
+            -14,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "Mobile forms 2.8% vs desktop 3.2% baseline; multi-step transitions amplify gap."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Multi-step on mobile when product is simple and traffic is mobile-majority (>50%)",
+        "Multi-step on ≤4-field forms",
+        "Treating desktop multi-step winners as portable to mobile"
+      ],
+      "references_visual": [],
+      "notes": "Anti-pattern. Single-page wins when ≤4 fields OR mobile-majority OR address-autocomplete / native payment (Apple Pay) handles field reduction natively."
+    },
+    {
+      "pattern_id": "progressive_signup_email_password_only",
+      "category": "form",
+      "description": "Minimal initial signup (email + password, or email + magic link only); defer all additional data collection to post-activation onboarding.",
+      "applies_to": [
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Dropbox minimal signup case",
+          "lift_range_pct": [
+            40,
+            40
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "vs longer signup forms; bundled with brand effects."
+        },
+        {
+          "source": "Field-count cliff (Digital Applied 2026)",
+          "lift_range_pct": [
+            30,
+            60
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2026,
+          "notes": "3 fields → 23.1% CVR vs 7 fields → 11.4% CVR (~2x absolute)."
+        }
+      ],
+      "prerequisites": [
+        "Self-serve product where activation can occur with minimal upfront data",
+        "Progressive profiling / enrichment available for downstream qualification (Clearbit, ZoomInfo)",
+        "Sales/ops capacity matches resulting lead volume"
+      ],
+      "anti_patterns": [
+        "High-ticket B2B demo flows where qualification fields are mandatory for sales routing",
+        "Eliminating qualification fields when sales team has limited capacity (volume up, revenue conversion down)"
+      ],
+      "references_visual": [],
+      "notes": "Highest-leverage form pattern for self-serve SaaS. Pair with progressive profiling in product onboarding."
+    },
+    {
+      "pattern_id": "progress_indicator_fast_to_slow",
+      "category": "form",
+      "description": "Visible progress bar / step counter on multi-step form with FAST-TO-SLOW velocity (early steps fly by; easy fields front-loaded). Communicates 'how far' + 'what's next' via section titles + numeric or percentage indicator.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Handprint Tech aggregate (well-designed progress bars)",
+          "lift_range_pct": [
+            10,
+            18
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024
+        },
+        {
+          "source": "Vendio A/B test multi-step + progress",
+          "sample_size": 25500,
+          "lift_range_pct": [
+            18,
+            18
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2024
+        },
+        {
+          "source": "Formstack via Responsify (progress-attributed sub-lift)",
+          "lift_range_pct": [
+            20,
+            30
+          ],
+          "confidence": "low",
+          "vertical": "general",
+          "year": 2023,
+          "notes": "Bundled with multi-step architectural change."
+        }
+      ],
+      "prerequisites": [
+        "Fast-to-slow velocity (early steps fly by, decelerate toward end) — load-bearing prerequisite",
+        "Front-load easy fields (simple selects, prefilled, single-tap); defer complex/cognitive fields to later steps",
+        "Truthful tracking where feasible; fictional progress is fallback only",
+        "Pair with inline validation (+22% success, -42% completion time per Reform)",
+        "Mobile-first deployment — bigger lift on smaller screens"
+      ],
+      "anti_patterns": [
+        "Distributing effort evenly across steps in 'logical' order (contact → company → qualification) instead of effort/complexity order",
+        "Bolting progress UI onto an already-mature checkout (GoodUI median +0.2% — diminishing returns)",
+        "Phantom progress steps (conditional-logic skipped steps shown in bar)"
+      ],
+      "references_visual": [],
+      "notes": "Mobile is the higher-leverage surface. Desktop checkouts on mature ecommerce have largely saturated this pattern."
+    },
+    {
+      "pattern_id": "progress_indicator_slow_to_fast_anti_pattern",
+      "category": "form",
+      "description": "Anti-pattern: progress bars where EARLY progress feels slow (constant-speed or slow-to-fast velocity), without effort-ordered field sequencing. Nearly doubles abandonment vs fast-to-slow.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "NIH/PMC controlled experiment (PMC2910434)",
+          "lift_range_pct": [
+            -93,
+            -50
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2023,
+          "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC2910434/",
+          "notes": "Slow-to-fast: 21.8% breakoff vs fast-to-slow: 11.3% breakoff (χ²(3)=31.57, p<.001). Constant-speed: 14.4% breakoff, statistically indistinguishable from no feedback (12.7%)."
+        },
+        {
+          "source": "Irrational Labs meta-analysis (32 experiments)",
+          "lift_range_pct": [
+            -30,
+            0
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2023,
+          "url": "https://irrationallabs.com/blog/knowledge-cuts-both-ways-when-progress-bars-backfire/"
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Constant-speed progress with no front-loading (no lift over showing nothing)",
+        "Slow-to-fast progress where early steps feel heavy (doubles abandonment)",
+        "Fictional progress that overshoots actual completion time (destroys trust)",
+        "Progress indicator on a single-step form"
+      ],
+      "references_visual": [],
+      "notes": "One of the most rigorously documented negative findings in form UX research. Agent should flag whenever user proposes adding a progress bar without controlling for early-step effort sequencing."
+    },
+    {
+      "pattern_id": "exit_intent_lead_magnet_desktop",
+      "category": "urgency",
+      "description": "Desktop-only exit-intent modal offering a PAGE-SPECIFIC lead magnet (content upgrade matching page topic) on cursor-toward-chrome signal. Targets abandoning high-intent visitors.",
+      "applies_to": [
+        "landing",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "Wisepops 2025-2026 aggregate",
+          "lift_range_pct": [
+            2.81,
+            19.63
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2026,
+          "url": "https://wisepops.com/blog/exit-popup-examples",
+          "notes": "2.81% average, 19.63% top-decile capture rate."
+        },
+        {
+          "source": "OptinMonster Inbound Marketing case",
+          "lift_range_pct": [
+            180,
+            189
+          ],
+          "confidence": "low",
+          "vertical": "lead_gen",
+          "year": 2022,
+          "url": "https://optinmonster.com/case-study-inbound-marketing-increased-conversions-189-lead-magnets/",
+          "notes": "Older cherry-picked case; declining with habituation."
+        },
+        {
+          "source": "Lucatagliaferro lead-magnet vs newsletter",
+          "lift_range_pct": [
+            100,
+            150
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "Desktop 4.7% lead magnet vs 1.84% newsletter; mobile 7.73% vs 3.83%."
+        }
+      ],
+      "prerequisites": [
+        "Page-specific (NOT site-wide) — match offer to known abandonment reason for that page",
+        "Behavioral diagnosis first (GA4 + Clarity/Hotjar) before picking offer",
+        "Desktop only — disable on mobile entirely (cursor signal doesn't exist on touch)",
+        "One-field form (email-only) outperforms multi-field",
+        "Frequency capping + user-state awareness (don't show to already-converted)",
+        "Reserve best offer for exit-intent (no overlap with entry/timed popups)",
+        "≥20k monthly visitors for statistical validity"
+      ],
+      "anti_patterns": [
+        "Site-wide generic deployment with no page-specific copy",
+        "'Don't leave!' / 'Wait!' generic copy",
+        "Identical popup on desktop and mobile",
+        "Newsletter-only offers ('Join our newsletter for updates')",
+        "Manipulative 'No, I don't want to save money' opt-out copy"
+      ],
+      "references_visual": [],
+      "notes": "Realistic 2026 expectation: 2-5% baseline capture, 8-15% optimized. Avoid 2015-2017 era +600% cherry-picked outliers — habituation has eroded those lifts."
+    },
+    {
+      "pattern_id": "exit_intent_trial_friction_reducer_saas",
+      "category": "urgency",
+      "description": "Desktop exit-intent on B2B SaaS pricing / trial page offering a friction-reducing reminder ('Try free 14 days, no credit card'). Reframes objection rather than discounting.",
+      "applies_to": [
+        "pricing",
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "HubSpot free-trial page case",
+          "lift_range_pct": [
+            15,
+            15
+          ],
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "+15% trial signups, -22% bounce — canonical B2B SaaS exit-intent pattern."
+        }
+      ],
+      "prerequisites": [
+        "B2B SaaS with self-serve trial path",
+        "Offer addresses a real objection (credit-card friction, trial length, commitment)",
+        "Desktop only",
+        "Single CTA, single field",
+        "Measure trial-to-paid downstream, not just popup conversion"
+      ],
+      "anti_patterns": [
+        "Discount offers on B2B SaaS exit-intent (cheapens brand, attracts wrong-fit users)",
+        "Aggressive discount stacking on repeat exits",
+        "Exit-intent on confirmation/thank-you pages"
+      ],
+      "references_visual": [],
+      "notes": "B2B SaaS variant is a LEAD QUALIFICATION mechanism, not revenue recovery. Operates within 2-6 month sales cycles. Success = MQL volume + trial-to-paid, not immediate conversion."
+    },
+    {
+      "pattern_id": "exit_intent_mobile_anti_pattern",
+      "category": "urgency",
+      "description": "Anti-pattern: deploying exit-intent modals on mobile. Mobile has no cursor → core detection mechanism (cursor velocity toward browser chrome) fails. Alternative signals (rapid scroll up, back-button, idle time) have unacceptable false-positive rates.",
+      "applies_to": [
+        "landing",
+        "product",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Fluentos / industry consensus",
+          "lift_range_pct": [
+            -10,
+            0
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://fluentos.com/en/blog/exit-intent-on-mobile/",
+          "notes": "'Exit intent on mobile is not very effective and is failing.'"
+        },
+        {
+          "source": "Google mobile intrusive interstitial penalty",
+          "lift_range_pct": [
+            -15,
+            0
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://developers.google.com/search/docs/appearance/avoid-intrusive-interstitials",
+          "notes": "Aggressive mobile overlays risk search demotion."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Mobile exit-intent based on rapid scroll, back-button, or idle time (high false-positive)",
+        "Identical desktop and mobile popup configuration",
+        "Modal popups on mobile occupying 90%+ of viewport"
+      ],
+      "references_visual": [],
+      "notes": "Architectural fact, not aesthetic preference. Use time-based or scroll-depth triggers on mobile instead. Disable exit-intent in mobile config."
+    },
+    {
+      "pattern_id": "annual_billing_default",
+      "category": "pricing",
+      "description": "Annual billing pre-selected as default on B2B SaaS pricing page (with visible monthly toggle), paired with 15-20% annual discount. Trades a slice of immediate signup CVR for 2-3x annual mix, 2-3x LTV, ~3x customer tenure.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "MIDA.so / Dodo Payments synthesis (annual mix shift)",
+          "lift_range_pct": [
+            100,
+            200
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "2-3x annual plan adoption when default; overall CVR neutral-to-slightly-improved."
+        },
+        {
+          "source": "Dropbox Business annual reframe",
+          "lift_range_pct": [
+            15,
+            15
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "+15% annual plan selection; bundled with messaging + friction reduction."
+        },
+        {
+          "source": "Baremetrics retention delta",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://baremetrics.com/blog/annual-vs-monthly-pricing-better-retention",
+          "notes": "12-month retention: annual 92% vs monthly 68% (+24pp). LTV 2-3x."
+        },
+        {
+          "source": "Baremetrics raw CVR caveat",
+          "lift_range_pct": [
+            -50,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "Monthly-default has ~50% higher RAW signup CVR — annual-default is deliberate CVR-for-LTV trade."
+        }
+      ],
+      "prerequisites": [
+        "Product-market fit + customer trust validated (aggressive annual-first pre-trust backfires)",
+        "Discount calibrated to 15-20% (below = no uptake; above = revenue waste)",
+        "Both options visible — monthly must be discoverable, not hidden",
+        "Trust signals paired (money-back guarantee, transparent cancellation) — compounds default lift by ~34%",
+        "≤3 pricing tiers to avoid choice overload compounding with billing toggle",
+        "Customer segment match: enterprise yes, small SMB no, mid-market depends on brand maturity"
+      ],
+      "anti_patterns": [
+        "Hiding monthly entirely (drives backlash, churn after sign-up, negative reviews)",
+        "Annual-first during free trial pre-value-proof",
+        "Discount <15% (insufficient to overcome temporal discounting)",
+        "Discount >20% (revenue sacrifice without proportional lift)",
+        "Forcing annual on very-small-biz / cost-sensitive geos"
+      ],
+      "references_visual": [],
+      "notes": "Headline metric is annual MIX SHIFT (2-3x), not raw CVR. The LTV/retention/cash-flow story is the actual business case. Encode metric_trade_off: improves LTV at the cost of small immediate CVR slice."
+    },
+    {
+      "pattern_id": "annual_savings_concrete_framing",
+      "category": "pricing",
+      "description": "Display annual savings using concrete framing ('Get 2 months free', '$240 saved/year') instead of abstract percentage ('Save 17%') alongside annual price.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "GrowthRock savings-% A/B (large ecommerce)",
+          "sample_size": 700000,
+          "lift_range_pct": [
+            2.57,
+            2.57
+          ],
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "url": "https://growthrock.co/ecommerce-pricing-ab-test-adding-savings-percent-can-increase-conversion-rate/",
+          "notes": "+2.57% CVR (p<0.01) only when discount varied across products. Null when flat."
+        },
+        {
+          "source": "Price Intelligently / canonical framing research",
+          "lift_range_pct": null,
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "Concrete > abstract framing per cognitive psych literature."
+        }
+      ],
+      "prerequisites": [
+        "Differentiated savings across tiers — flat % across all tiers neutralizes effect (GrowthRock null condition)",
+        "15-20% effective discount range",
+        "Concrete framing: '2 months free' / '$X saved' over '17% off'"
+      ],
+      "anti_patterns": [
+        "Identical discount % shown across all tiers (savings call-out has zero impact)",
+        "Percentage framing when concrete equivalent is available",
+        "Inconsistent discount levels across channels (website / sales / email)"
+      ],
+      "references_visual": [],
+      "notes": "Modest absolute lift (+2-3% CVR) but cheap to implement. Slack anchors at ~17% — canonical example in optimization window."
+    },
+    {
+      "pattern_id": "annual_billing_hidden_monthly_anti_pattern",
+      "category": "pricing",
+      "description": "Anti-pattern: hiding monthly billing entirely or making it hard to find while pushing annual. Drives customer backlash, churn after sign-up, negative reviews, support burden.",
+      "applies_to": [
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Reddit SaaS practitioner consensus + churn impact synthesis",
+          "lift_range_pct": [
+            -15,
+            0
+          ],
+          "confidence": "low",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "Negative effect on post-signup retention, NPS, support volume."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Monthly toggle buried in collapsed accordion / secondary menu",
+        "Annual-only pricing page with monthly available only via sales call",
+        "Surprise annual lock-in on subscription page after trial"
+      ],
+      "references_visual": [],
+      "notes": "Anti-pattern. Both options must be visible. Annual-default ≠ annual-only."
+    },
+    {
+      "pattern_id": "free_trial_credit_card_required",
+      "category": "pricing",
+      "description": "Free trial requires credit card at signup. Reduces top-of-funnel signup volume but converts trial-to-paid at 2.5-5x higher rate. Targets >60% trial-to-paid (Sixteen Ventures 'great' benchmark).",
+      "applies_to": [
+        "signup",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Tomasz Tunguz (600 SaaS analysis)",
+          "sample_size": 600,
+          "lift_range_pct": [
+            150,
+            150
+          ],
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2023,
+          "url": "https://www.saastr.com/learnings-free-trials-tomasz/",
+          "notes": "2.5x trial-to-paid conversion vs no-CC; only 12/600 required payment upfront."
+        },
+        {
+          "source": "ChartMogul SaaS Conversion Report",
+          "lift_range_pct": [
+            400,
+            400
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://chartmogul.com/reports/saas-conversion-report/",
+          "notes": "CC-required ~30% conversion vs no-CC ~5-6%; likely includes selection effects."
+        },
+        {
+          "source": "Sixteen Ventures (Wes Bush) benchmarks",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "Opt-in (no CC) >25% great; opt-out (CC) >60% great."
+        }
+      ],
+      "prerequisites": [
+        "Sales-light / self-serve motion where trial-to-paid % matters more than trial volume",
+        "Product TTV <14 days (trial length should be 2x TTV)",
+        "Transparent cancellation policy (no dark-pattern auto-charging)",
+        "Trial length matches TTV — 14 days for moderate, 7 days for simple, 30 only if TTV >14"
+      ],
+      "anti_patterns": [
+        "CC requirement on products with TTV >14 days (users abandon before activating)",
+        "Surprise auto-charge with no reminder email",
+        "Hidden cancellation friction"
+      ],
+      "references_visual": [],
+      "notes": "Schema needs both signup_cvr_delta_pct (negative, -30 to -50) AND trial_to_paid_lift_pct (positive, +150 to +400) — short-term volume tax, long-term quality gain. Absolute paid customers may increase under no-CC despite lower % conversion."
+    },
+    {
+      "pattern_id": "trial_length_matches_ttv",
+      "category": "pricing",
+      "description": "Match free-trial duration to ~2x product time-to-value (TTV). 7 days for simple products (TTV <48h), 14 days for moderate (TTV 3-7d), 30 days only when TTV >14 days.",
+      "applies_to": [
+        "signup",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Athenic A/B test (5,400 users, 1,800/arm)",
+          "sample_size": 5400,
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://getathenic.com/blog/saas-free-trial-optimization-7-vs-14-vs-30-day",
+          "notes": "Simple: 7d=12.4%, 14d=11.8%, 30d=8.2%. Moderate: 14d=11.2% optimal vs 7d=4.8%, 30d=6.4%. Complex: even 30d degraded."
+        },
+        {
+          "source": "Tomasz Tunguz null finding",
+          "sample_size": 600,
+          "lift_range_pct": [
+            0,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "notes": "No aggregate effect across 600 cos — contradicts Athenic at company-specific level. Heterogeneity is the headline."
+        },
+        {
+          "source": "Gartner-cited shorter-trial bias",
+          "lift_range_pct": [
+            0,
+            20
+          ],
+          "confidence": "low",
+          "vertical": "saas",
+          "year": 2023
+        }
+      ],
+      "prerequisites": [
+        "Product TTV measured (activation event timing)",
+        "Trial length matched to ~2x TTV (heuristic)",
+        "2025 SMB benchmark: 14 days is median (down from 17 in 2024)"
+      ],
+      "anti_patterns": [
+        "30-day default trial on simple products (consistently underperforms 14-day in head-to-head)",
+        "Generous trial extension as fix for poor activation (fix onboarding instead)",
+        "Feature-limited or seat-limited trial instead of time/usage-limited (feature limits prevent full value experience; convert ~2x worse)"
+      ],
+      "references_visual": [],
+      "notes": "Tunguz null aggregates across heterogeneous products and obscures the per-product effect. Athenic's TTV-bucket structure is the load-bearing finding."
+    },
+    {
+      "pattern_id": "hero_static_screenshot_b2b_saas",
+      "category": "above_fold",
+      "description": "High-fidelity static product screenshot or dashboard image as B2B SaaS hero, instead of autoplay video. Lower load cost, better mobile economics, comparable conversion in most contexts.",
+      "applies_to": [
+        "landing",
+        "pricing"
+      ],
+      "evidence": [
+        {
+          "source": "Device Magic SaaS homepage test (image slider beat video)",
+          "lift_range_pct": [
+            31,
+            35
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://www.invespcro.com/blog/30-ab-tests-to-boost-your-saas-conversion-rates/",
+          "notes": "Image variant beat video by +35% to signup, +31% downstream — static won decisively."
+        },
+        {
+          "source": "CXL ecommerce case",
+          "lift_range_pct": [
+            3.92,
+            3.92
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2023,
+          "notes": "Static +3.92% CVR vs video +0.85% — $106k revenue delta."
+        },
+        {
+          "source": "Baymard UX research",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "url": "https://baymard.com/ecommerce-design-examples/video-and-360-views",
+          "notes": "59% of users skip product videos entirely; 83% never attempt 360° views."
+        }
+      ],
+      "prerequisites": [
+        "Real product UI / dashboard visible (not generic stock imagery)",
+        "Image compressed for fast LCP (<2.5s)",
+        "Mobile-responsive crop / focal point preserves the key UI element",
+        "Caption / label overlay communicates the action shown"
+      ],
+      "anti_patterns": [
+        "Generic stock photos of laptops / smiling teams",
+        "Abstract illustrations that don't show the product",
+        "Decorative hero photography without UI substance"
+      ],
+      "references_visual": [],
+      "notes": "Default for mobile-heavy B2B SaaS traffic. Lower production cost than video, lower load penalty, better Baymard-documented user preference."
+    },
+    {
+      "pattern_id": "hero_autoplay_video_audio_anti_pattern",
+      "category": "above_fold",
+      "description": "Anti-pattern: hero video with autoplay AND audio. Unanimous expert consensus against. Triggers accessibility violations (photosensitive epilepsy, vestibular disorders), browser autoplay policies, and trust erosion.",
+      "applies_to": [
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Unbounce expert consensus",
+          "lift_range_pct": [
+            -20,
+            5
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://unbounce.com/landing-pages/autoplay-landing-page-best-practices/"
+        },
+        {
+          "source": "Harvard Digital Accessibility / Princeton guidance",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://designsystem.harvardsites.harvard.edu/news/2025/02/autoplaying-hero-background-videos-digital-design",
+          "notes": "Explicit prohibition for safety + ADA compliance."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Autoplay-with-audio on first impression",
+        "Hero video without user pause/mute/stop controls",
+        "Hero video without captions/transcripts",
+        "Flash rate >3/sec",
+        "Stock B-roll instead of real product UI"
+      ],
+      "references_visual": [],
+      "notes": "Enterprise procurement increasingly screens for accessibility — autoplay violations may eliminate B2B SaaS vendors from enterprise deals. One of the few areas with near-unanimous expert consensus."
+    },
+    {
+      "pattern_id": "hero_video_mobile_load_anti_pattern",
+      "category": "above_fold",
+      "description": "Anti-pattern: deploying hero video on mobile-heavy traffic without aggressive lazy-load + compression. Page-load penalty (1s = -7% CVR, 3s = -20% CVR) typically exceeds the lift video could earn among completing visitors.",
+      "applies_to": [
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Google mobile load benchmarks",
+          "lift_range_pct": [
+            -20,
+            -7
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "1s delay = ~7% CVR drop; 3s delay = ~20%. 53% of mobile visitors abandon if page doesn't load in 3s."
+        },
+        {
+          "source": "Wiro / Instapage mobile speed research",
+          "lift_range_pct": [
+            -20,
+            -7
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.wiro.agency/blog/how-a-1-second-delay-costs-you-a-7-drop-in-conversions"
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Hero video shipped to mobile without device-segmented A/B measurement",
+        "Hero video without lazy-load after first paint",
+        "Uncompressed video formats (>2MB)",
+        "Hero video forcing user to scroll past it on mobile"
+      ],
+      "references_visual": [],
+      "notes": "Break-even math: hero video on mobile must overcome ~15-20% baseline CVR loss from added load just to break even. Bar is much higher than typical 3-12% test lifts. Anti-pattern unless rigorously implemented + device-segmented."
+    },
+    {
+      "pattern_id": "hero_click_to_play_video_demo",
+      "category": "above_fold",
+      "description": "Click-to-play hero video with prominent play button (NOT autoplay), <30s duration, value prop in first 5 seconds, real product UI. Lazy-loaded after first paint.",
+      "applies_to": [
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Treepodia visible play icon",
+          "lift_range_pct": [
+            100,
+            100
+          ],
+          "confidence": "low",
+          "vertical": "ecommerce",
+          "year": 2022,
+          "notes": "+100% video view rate vs no icon (engagement metric, not conversion)."
+        },
+        {
+          "source": "CRO Show / Crometrics animated hero (isolated)",
+          "lift_range_pct": [
+            7,
+            7
+          ],
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2023,
+          "url": "https://crometrics.com/blog/animated-vs-static-hero-banners-cro-show/",
+          "notes": "+7% order completions, animation as sole variable."
+        }
+      ],
+      "prerequisites": [
+        "Click-to-play with prominent play button (NOT autoplay-with-audio)",
+        "Lazy-loaded after initial page render",
+        "Aggressively compressed (modern codecs)",
+        "<30 seconds duration; value prop in first 5 seconds",
+        "Silent autoplay AT MOST, with captions",
+        "Real product UI / dashboards (not stock B-roll)",
+        "Device-segmented measurement (don't pool desktop/mobile)"
+      ],
+      "anti_patterns": [
+        "Autoplay-with-audio (see hero_autoplay_video_audio_anti_pattern)",
+        "Generic spokesperson video instead of product demo",
+        "Video >60s without ability to skip to key moments"
+      ],
+      "references_visual": [],
+      "notes": "Realistic central tendency is flat-to-modest-lift, with mobile downside risk dominating. The widely-cited '+65% from video' / '+86% from video' numbers are aspirational ceilings from publication-biased aggregates."
+    },
+    {
+      "pattern_id": "above_fold_decorative_removal",
+      "category": "above_fold",
+      "description": "Strip decorative elements from above the fold on cold-traffic landing pages: secondary CTAs, logo walls, testimonial carousels, secondary nav. Single primary CTA + benefit headline + supporting subhead + product image only.",
+      "applies_to": [
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Aimers SaaS hero rebuild case",
+          "lift_range_pct": [
+            47,
+            47
+          ],
+          "confidence": "low",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://aimers.io/blog/7-critical-saas-landing-page-elements-that-convert-visitors-into-paying-customers",
+          "notes": "Removed 3 CTAs + carousel + logo wall; +47% in week 1. No sample size, novelty effect possible."
+        },
+        {
+          "source": "Digital Applied single-CTA vs multi-CTA",
+          "lift_range_pct": [
+            28,
+            28
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2026,
+          "notes": "Single-CTA 13.5% vs multi-CTA 10.5%."
+        }
+      ],
+      "prerequisites": [
+        "Cold paid traffic (one goal per visit)",
+        "Single conversion goal for the page",
+        "Above-fold communicates what + who + why in 5 seconds",
+        "Decorative removal validated against bounce + scroll-depth, not just CVR"
+      ],
+      "anti_patterns": [
+        "Removing trust signals that are load-bearing for the audience segment (e.g., enterprise SOC 2 badges)",
+        "Stripping logos when audience-segment match is the conversion driver"
+      ],
+      "references_visual": [],
+      "notes": "Most evidence is bundled-change case studies, not isolated tests. Treat +47% as ceiling, +15-25% as realistic median when implementation is clean."
+    },
+    {
+      "pattern_id": "cta_first_person_pronoun",
+      "category": "cta",
+      "description": "Switch CTA copy from second-person ('Start your free trial') to first-person ('Start my free trial'). Activates psychological ownership.",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Unbounce Conversion Benchmark Report 2026 (platform-wide)",
+          "lift_range_pct": [
+            14,
+            14
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2026,
+          "notes": "Large platform-wide dataset; modern conservative baseline."
+        },
+        {
+          "source": "ContentVerve / Unbounce single-variable test (2014)",
+          "lift_range_pct": [
+            90,
+            90
+          ],
+          "confidence": "low",
+          "vertical": "general",
+          "year": 2014,
+          "notes": "3-week test; outlier from older baseline before first-person became widespread. Likely fade due to habituation."
+        },
+        {
+          "source": "VerticalResponse synthesis",
+          "lift_range_pct": [
+            10,
+            90
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2023
+        }
+      ],
+      "prerequisites": [
+        "CTA verb structure permits the pronoun naturally ('Start MY', 'Get MY', 'Show ME')",
+        "Audience hasn't been over-exposed to first-person CTAs from competitors",
+        "Pricing-page CTA matches post-click reality"
+      ],
+      "anti_patterns": [
+        "Forcing first-person where it sounds awkward ('Cancel my subscription')",
+        "Quoting the 2014 +90% figure as the expected lift (modern baseline is ~14%)"
+      ],
+      "references_visual": [],
+      "notes": "High-confidence, easy-to-implement, modest modern lift. Pair with cta_specific_outcome_vs_generic for compounding."
+    },
+    {
+      "pattern_id": "cta_specific_outcome_vs_generic",
+      "category": "cta",
+      "description": "Replace generic action verbs ('Submit', 'Sign Up', 'Get Started') with specific outcome language ('Get My Audit', 'Download the 50-Page Guide', 'Start 14-Day Trial').",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Digital Applied 2026 benchmarks (multi-study synthesis)",
+          "lift_range_pct": [
+            20,
+            35
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2026,
+          "notes": "'Get My Audit' vs 'Submit' = +31% — synthesis across thousands of LP experiments."
+        },
+        {
+          "source": "KissMetrics patterns (directional)",
+          "lift_range_pct": null,
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "notes": "'Start 14-Day Trial' > 'Start Free Trial'; 'See Pricing for Your Team' > 'View Pricing'."
+        }
+      ],
+      "prerequisites": [
+        "CTA messaging aligns with prospect's actual decision question at that page stage",
+        "Specific outcome is accurate for the prospect's workflow (inflated claims = credibility loss)",
+        "CTA copy matches post-click experience (no bait-and-switch to sales-call form)"
+      ],
+      "anti_patterns": [
+        "Generic action verbs on pages where prospects have context",
+        "Inflated outcome claims that don't apply to the user's case",
+        "Vague action verbs above the fold on simple offers"
+      ],
+      "references_visual": [],
+      "notes": "Highest-confidence single-variable lift in the CTA cluster. Modern defensible median ~+31%."
+    },
+    {
+      "pattern_id": "cta_friction_reducing_microcopy",
+      "category": "cta",
+      "description": "Add friction-reducing micro-copy directly BELOW the CTA button ('Takes 2 minutes. No credit card.', 'Free forever for 3 users'). Additive lift; stacks with other CTA wins.",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Digital Applied 2026 benchmark",
+          "lift_range_pct": [
+            5,
+            15
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2026,
+          "notes": "Average +9% CVR from benefit clarifier below CTA."
+        },
+        {
+          "source": "Soocial 'It's free' addition",
+          "lift_range_pct": [
+            28,
+            28
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2023
+        }
+      ],
+      "prerequisites": [
+        "Micro-copy addresses a REAL objection (cost, time, commitment)",
+        "Placement directly under button — NOT inside button text",
+        "Copy is accurate (real time-to-completion, real no-CC policy)"
+      ],
+      "anti_patterns": [
+        "Friction-reducing language stuffed inside button text instead of below",
+        "Redundant micro-copy when surrounding copy already establishes the same point",
+        "Inaccurate time estimates ('Takes 30 seconds' when form actually takes 5 minutes)"
+      ],
+      "references_visual": [],
+      "notes": "Cheap, additive, stacks well with first-person + specific-outcome."
+    },
+    {
+      "pattern_id": "cta_free_word_context_dependent",
+      "category": "cta",
+      "description": "Adding the word 'Free' to CTA / button copy. Context-dependent — strong positive when cost objection is primary; negative when free-ness is already obvious from surrounding copy.",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Corcentric 'Get a Demo' → 'Free Demo'",
+          "lift_range_pct": [
+            99.42,
+            99.42
+          ],
+          "confidence": "low",
+          "vertical": "saas",
+          "year": 2022,
+          "notes": "Single test, demo-cost objection-specific."
+        },
+        {
+          "source": "Unbounce platform-wide (CTAs with 'free' vs without)",
+          "lift_range_pct": [
+            -16.8,
+            -16.8
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "CTAs WITHOUT 'free' outperformed CTAs WITH — 10.79% vs 9.24%."
+        },
+        {
+          "source": "CXL email-marketing test",
+          "lift_range_pct": [
+            -17,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2023,
+          "url": "https://cxl.com/blog/when-free-converts-and-when-it-doesnt/"
+        }
+      ],
+      "prerequisites": [
+        "Cost / hidden-fee objection is primary in the audience's decision journey",
+        "Surrounding copy does NOT already establish free-ness (redundancy backfires)",
+        "Page does not have 'Free' repeated 5+ times in headline + subhead + microcopy"
+      ],
+      "anti_patterns": [
+        "'Free' added when surrounding copy already says 'Free trial' / 'No credit card' / '14 days free' (dilutes message, -16.8% Unbounce)",
+        "Universal best-practice deployment without context check"
+      ],
+      "references_visual": [],
+      "notes": "Most evidence-contradicted pattern in the CTA cluster. Use only when cost objection is the primary blocker. Default platform-wide effect in modern data is NEGATIVE."
+    },
+    {
+      "pattern_id": "mobile_nav_items_capped_5",
+      "category": "navigation",
+      "description": "Cap primary mobile navigation at ≤5 items (3-4 preferred for B2B SaaS). Beyond 5 forces hidden patterns or breaks 44-48px touch-target geometry.",
+      "applies_to": [
+        "landing",
+        "pricing",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "NN/g mobile navigation patterns",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.nngroup.com/articles/mobile-navigation-patterns/",
+          "notes": "4-5 items is geometric / cognitive ceiling for mobile tab bars."
+        },
+        {
+          "source": "Brillmark mobile nav aggregate",
+          "lift_range_pct": [
+            22,
+            35
+          ],
+          "confidence": "med",
+          "vertical": "ecommerce",
+          "year": 2024,
+          "notes": "Page depth increase from mobile nav improvements (Tier-1 pattern)."
+        },
+        {
+          "source": "NerdCow B2B SaaS guidance",
+          "lift_range_pct": null,
+          "confidence": "med",
+          "vertical": "saas",
+          "year": 2024,
+          "url": "https://nerdcow.co.uk/blog/b2b-saas-website-navigation/"
+        }
+      ],
+      "prerequisites": [
+        "Task-oriented site (B2B SaaS, booking, productivity) — not browse-mostly catalog",
+        "44-48px touch targets",
+        "Action-oriented labels (JTBD framing)",
+        "Core Web Vitals: INP ≤200ms p75, LCP ≤2.5s, CLS <0.1"
+      ],
+      "anti_patterns": [
+        "7+ primary items requiring overflow into hamburger",
+        "Touch targets <44px",
+        "Generic 'More' / 'Menu' that hides primary actions"
+      ],
+      "references_visual": [],
+      "notes": "Geometric constraint, not just cognitive. 89% of successful A/B tests require separate mobile variations — desktop nav wins rarely transfer."
+    },
+    {
+      "pattern_id": "mobile_bottom_tab_nav_task_oriented",
+      "category": "navigation",
+      "description": "Visible bottom-tab navigation (vs hidden hamburger) for task-oriented B2B SaaS / productivity / booking flows on mobile. Aligns with thumb-reach zone.",
+      "applies_to": [
+        "product",
+        "landing"
+      ],
+      "evidence": [
+        {
+          "source": "Spotify mobile redesign (hamburger → bottom tab)",
+          "lift_range_pct": [
+            9,
+            30
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2022,
+          "url": "https://www.torinblankensmith.com/projects/spotify-mobile-redesign",
+          "notes": "+9% total interactions, +30% menu-item interactions; product redesign, not clean A/B."
+        },
+        {
+          "source": "NN/g 'out of sight, out of mind' multi-study",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "Hidden hamburger consistently reduces discoverability across 19 in-person + 2 remote moderated studies, 8 countries."
+        }
+      ],
+      "prerequisites": [
+        "Task-oriented site (NOT browse-heavy catalog)",
+        "≤5 primary destinations",
+        "Bottom tab doesn't occlude form inputs / CTAs",
+        "Mobile only — bottom-tab on desktop is an anti-pattern"
+      ],
+      "anti_patterns": [
+        "Bottom-tab on desktop",
+        "Bottom-tab on browse-mostly catalog ecom (Amazon hamburger beats dropdown counter-evidence)",
+        "Bottom-tab without thumb-reach ergonomic validation"
+      ],
+      "references_visual": [],
+      "notes": "B2B SaaS sits firmly in task-oriented bucket → bias toward visible bottom tabs. Use Spotify as directional, not RCT evidence."
+    },
+    {
+      "pattern_id": "mobile_hamburger_task_oriented_anti_pattern",
+      "category": "navigation",
+      "description": "Anti-pattern: hamburger menu on task-oriented B2B SaaS mobile where users have specific goals and need rapid path to destinations. Reduces discoverability vs visible alternatives.",
+      "applies_to": [
+        "landing",
+        "product"
+      ],
+      "evidence": [
+        {
+          "source": "NN/g multi-study (19 in-person + 2 remote moderated, 8 countries)",
+          "lift_range_pct": [
+            -15,
+            0
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.nngroup.com/articles/mobile-navigation-patterns/"
+        },
+        {
+          "source": "Amazon hamburger vs dropdown (counter-evidence for browse-heavy)",
+          "lift_range_pct": [
+            0,
+            5
+          ],
+          "confidence": "low",
+          "vertical": "ecommerce",
+          "year": 2018,
+          "url": "https://goodui.org/leaks/amazons-loaded-hamburger-menu-beats-its-older-dropdown-in-this-a-b-test/",
+          "notes": "Counter-example: loaded hamburger beat dropdown in browse-heavy ecom. Context matters."
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Hamburger on task-oriented site where users have specific destinations",
+        "Hidden nav for low-task-commitment exploratory traffic",
+        "Hamburger compounded with hidden secondary nav inside (terse labels, no descriptions)"
+      ],
+      "references_visual": [],
+      "notes": "Hamburger viable for browse-mostly catalogs (Amazon counter-evidence). Anti-pattern for task-oriented B2B SaaS. Encode site_type field to distinguish."
+    },
+    {
+      "pattern_id": "inline_validation_on_blur",
+      "category": "form",
+      "description": "Late (on-blur / field-exit) inline form validation with field-adjacent error messages. Reduces errors, completion time, and eye fixations versus on-submit-only validation.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Luke Wroblewski seminal study",
+          "sample_size": 6,
+          "lift_range_pct": [
+            20,
+            25
+          ],
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2009,
+          "url": "https://alistapart.com/article/inline-validation-in-web-forms/",
+          "notes": "+22% success rate, +31% satisfaction, -22% errors, -42% completion time, -47% eye fixations. Small n but eye-tracked + replicated."
+        },
+        {
+          "source": "Zuko Analytics high-converter benchmark",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.zuko.io/blog/web-form-design-lessons-from-examples-of-high-converting-forms",
+          "notes": "100% of forms achieving ≥80% conversion use field-exit (blur) inline validation as table-stakes."
+        }
+      ],
+      "prerequisites": [
+        "Validation fires on blur (field-exit), NOT on focus / input / keystroke",
+        "Error messages spatially adjacent to failing field (NOT top-of-form summary)",
+        "Error messages specific and actionable (see error_message_specificity)",
+        "Color + icon + text (NOT color alone — accessibility)",
+        "Success indicators (green check) on complex/multi-rule fields like password",
+        "Mobile: amplified value — context recovery is harder on small screens"
+      ],
+      "anti_patterns": [
+        "Validating on focus/input before user finishes typing (premature_validation_anti_pattern)",
+        "Validation summary at top of form distant from field",
+        "Generic 'Invalid entry' / 'Please correct this field' messages"
+      ],
+      "references_visual": [],
+      "notes": "Use Wroblewski +22% as conservative defensible number. Avoid Reform.app +215% / +400% figures — those are bundled marketing case studies, not isolated A/B."
+    },
+    {
+      "pattern_id": "premature_validation_anti_pattern",
+      "category": "form",
+      "description": "Anti-pattern: validating form fields on focus or keystroke BEFORE the user has finished typing. Generates false-error states, anxiety, loss of trust in the form.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "Designary case study (4-char username flagged invalid mid-type)",
+          "lift_range_pct": [
+            -15,
+            0
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2023,
+          "url": "https://blog.designary.com/p/avoid-early-real-time-validation-for-forms-as-it-harms-usability"
+        },
+        {
+          "source": "NN/g + Baymard converging guidance",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.nngroup.com/articles/errors-forms-design-guidelines/"
+        }
+      ],
+      "prerequisites": [],
+      "anti_patterns": [
+        "Validation firing on 'input' or 'focus' events",
+        "Flagging incomplete entries as errors before user finishes typing",
+        "Aggressive real-time format enforcement that interrupts user keystrokes"
+      ],
+      "references_visual": [],
+      "notes": "Premature-validation pitfall is AMPLIFIED on mobile (context recovery harder on small screens). Single biggest implementation lever for inline validation success."
+    },
+    {
+      "pattern_id": "error_message_specificity",
+      "category": "form",
+      "description": "Form error messages must be specific, actionable, and field-adjacent ('Email must include an @ symbol', not 'Invalid entry'). Prerequisite multiplier for inline validation lift to materialize.",
+      "applies_to": [
+        "signup",
+        "checkout"
+      ],
+      "evidence": [
+        {
+          "source": "NN/g 'Errors Forms Design Guidelines'",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://www.nngroup.com/articles/errors-forms-design-guidelines/",
+          "notes": "Generic error messages force reverse-engineering, increase repeat-submission attempts, can erase inline-validation gains entirely."
+        },
+        {
+          "source": "Zuko / Baymard converging guidance",
+          "lift_range_pct": null,
+          "confidence": "high",
+          "vertical": "general",
+          "year": 2024
+        }
+      ],
+      "prerequisites": [
+        "Errors describe what failed AND how to fix it",
+        "Errors spatially adjacent to failing field",
+        "Color + icon + text combined",
+        "Errors not gated behind hover/tap to reveal"
+      ],
+      "anti_patterns": [
+        "Generic 'Invalid entry' / 'Please correct this field'",
+        "Error summaries at top of form only",
+        "Color-only error indication"
+      ],
+      "references_visual": [],
+      "notes": "Prerequisite multiplier — the gain from inline_validation_on_blur evaporates without specific error messages. Encode as hard dependency, not soft suggestion."
+    },
+    {
+      "pattern_id": "show_password_toggle_mobile",
+      "category": "form",
+      "description": "Show-password visibility toggle on password fields, especially on mobile signup / login. Value concentrated on mobile due to higher typo rates on touch keyboards.",
+      "applies_to": [
+        "signup"
+      ],
+      "evidence": [
+        {
+          "source": "Georgia Tech CCS 2024 large-scale empirical study",
+          "lift_range_pct": [
+            3,
+            10
+          ],
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024,
+          "url": "https://faculty.cc.gatech.edu/~frankli/papers/PasswordMasking_CCS24.pdf",
+          "notes": "Mobile: show-password disproportionately valuable due to touch typo rates. Desktop: approximately neutral — no significant difference in typing speed, error rate, correction need."
+        },
+        {
+          "source": "NN/g + Zuko (companion: remove confirm-password)",
+          "lift_range_pct": null,
+          "confidence": "med",
+          "vertical": "general",
+          "year": 2024,
+          "notes": "Confirm-password field NEGATIVELY impacts conversion when visibility toggle is available."
+        }
+      ],
+      "prerequisites": [
+        "Mobile-priority signup flow",
+        "Toggle accessible via touch (44px minimum)",
+        "Cross-browser tested JavaScript",
+        "Remove 'confirm password' field when toggle is present"
+      ],
+      "anti_patterns": [
+        "Confirm-password field alongside visible password toggle (friction without value)",
+        "Toggle implemented with hover-only desktop interaction"
+      ],
+      "references_visual": [],
+      "notes": "Surprising finding: many CRO playbooks overstate desktop signup impact. Value is almost entirely mobile-concentrated."
+    }
+  ]
+}

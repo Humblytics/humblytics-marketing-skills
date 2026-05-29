@@ -123,6 +123,37 @@ Campaign (budget + settings)
 - Use custom intent audiences (people who searched relevant terms)
 - Retarget website visitors with testimonial/case study videos
 
+## Pulling Live Campaign Data from Humblytics
+
+If the workspace has Meta or Google Ads connected at **Connectors** in the Humblytics dashboard, query existing campaigns before making recommendations — don't suggest in a vacuum. All endpoints below accept the same Bearer `HUMBLYTICS_API_KEY` the rest of the public API uses.
+
+**Meta Ads** (base `/api/`):
+
+- `GET /api/meta-connections?propertyId={propertyId}` — list connections
+- `GET /api/meta-connections/{id}/status` — connection health + token expiry
+- `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns?since=&until=` — campaigns with performance metrics
+- `GET /api/meta-connections/{id}/accounts/{accountId}/daily-insights?since=&until=` — daily spend, impressions, clicks per campaign
+- `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — ads within a campaign (creative + destination URL)
+- `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata for one ad
+
+**Google Ads** (base `/api/`):
+
+- `GET /api/google-ads-connections?propertyId={propertyId}` — list connections
+- `GET /api/google-ads-connections/{id}` — single connection with customer accounts
+- `GET /api/google-ads-connections/{id}/campaigns?customerId={customerId}` — campaigns for a customer account
+
+**Full-funnel attribution** (base `/api/v1/`):
+
+- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=&endDate=` — per-campaign impressions → clicks → sessions → revenue, joined across Meta + Google + Stripe.
+
+**Read-only.** These endpoints don't let the agent pause campaigns or change budgets. For management actions, hand off to Meta's official `meta ads` CLI (creates resources in `PAUSED` status by default; scope the access token to a single ad account; never store it in `CLAUDE.md`). **Do not** route production ad-platform traffic through an unapproved Meta developer app — that is the documented ban pattern Meta is actively enforcing.
+
+When inspecting an underperforming campaign:
+1. Hit `ads-attribution` to confirm the campaign is actually spending without revenue (vs. a UTM tagging issue).
+2. List the campaign's ads via `/api/meta-connections/{id}/campaigns/{campaignId}/ads`.
+3. Pull the worst-performing ad's full creative via `/api/meta-connections/{id}/ads/{adId}`.
+4. Diagnose: destination URL mismatch, weak hook in the first 1–2 seconds (video), generic stock imagery, copy that doesn't match landing-page promise.
+
 ## Ad Copy Frameworks
 
 ### PAS (Problem-Agitate-Solve)
@@ -208,3 +239,15 @@ When creating an ad campaign, deliver:
 - **marketing-strategist** — Broader channel strategy and funnel design
 - **cro-optimizer** — Optimize the landing pages your ads drive traffic to
 - **content-strategist** — Create organic content that complements paid campaigns
+
+## Shared Frameworks (REQUIRED reading)
+
+Ad copy and landing-page coordination is where canon advice ("add urgency!", "use 'free'!") backfires loudest in B2B contexts. Read these before writing campaigns.
+
+- **`_shared/frameworks/anti-patterns.md`** — paid-media-specific counter-evidence:
+  - **Manufactured urgency**: detected fake urgency reduces customer LTV by 15–40%. A +20% short-term CVR lift can be net-negative on a CLTV basis. **B2B SaaS pricing-page countdowns frequently backfire** — buying committees read them as vendor desperation. FTC scrutiny is increasing on perpetual-reset timers.
+  - **"Free" in CTA copy**: Unbounce platform-wide data shows CTAs without "free" outperform CTAs with "free" by -16.8%. Counters the older Corcentric +99% myth. For B2B / enterprise, "free" can signal low-stakes / hobbyist product.
+  - **Customer logos**: high-variance. Docsend's +260% from enterprise→enterprise is the outlier; DoWhatWorks aggregate shows logos LOST in most A/B tests. Verify segment-match before using as a creative element.
+- **`_shared/frameworks/base-rate-priors.md`** — ad copy A/B tests have similar 25–35% win rates. When pitching creative variants, frame expected outcomes as "1-in-3 chance of beating control" not "this will lift ROAS 40%."
+- **`_shared/frameworks/preflight-checklist.md`** — confirm vertical, deal size, and audience awareness level before recommending copy formulas. Schwartz's 5 stages of awareness apply: cold traffic needs different ad copy than retargeted bottom-funnel prospects.
+- **`_shared/benchmarks/patterns.json`** — when proposing a creative angle, match to a `pattern_id` and quote evidence-backed lift ranges. Most relevant categories: `cta`, `headline`, `social_proof`, `urgency`.

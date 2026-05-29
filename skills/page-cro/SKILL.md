@@ -220,3 +220,17 @@ For each finding, include:
 - **ab-test-generator** — Create A/B tests from audit recommendations
 - **cro-optimizer** — Analyze the page within the broader funnel context
 - **ad-expert** — Ensure message match between ads and landing pages
+
+## Shared Frameworks (REQUIRED reading)
+
+Before recommending changes to a page, anchor against the shared primitives in `skills/_shared/`.
+
+- **`_shared/frameworks/preflight-checklist.md`** — verify URL, time range, conversion goal, vertical, and audience awareness level before producing findings. Generic page audits without preflight context produce generic recommendations.
+- **`_shared/frameworks/anti-patterns.md`** — critical for page audits. Read BEFORE recommending the canonical "best practice" version of any element:
+  - **Customer logos**: LOST in most DoWhatWorks A/B tests when prerequisites unmet (segment match, brand recognition)
+  - **Hero video**: net-negative on mobile due to 1s = -7% / 3s = -20% load penalty (Device Magic image-slider beat video by +35%)
+  - **Trust badges**: Baymard's homemade padlock outperformed branded SSL seals — brand recognition drives lift, not certification
+  - **Generic testimonials** (stock photos, anonymized "satisfied customer") actively hurt trust
+  - **"Free" in CTA copy**: Unbounce platform-wide null/negative — context-dependent
+- **`_shared/frameworks/ice-confidence-rubric.md`** — anchor each finding's Confidence score on `_shared/benchmarks/patterns.json` evidence quality, not familiarity.
+- **`_shared/benchmarks/patterns.json`** — when flagging a friction or proposing a fix, match it to a `pattern_id` and cite the lift range. Categories most relevant to page-cro: `social_proof`, `trust_signal`, `cta`, `headline`, `above_fold`, `form`.

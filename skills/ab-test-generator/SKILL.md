@@ -57,11 +57,11 @@ Pull data from Humblytics:
 - **Device split**: Mobile vs desktop behavior differences
 - **Source split**: How different traffic sources behave on this page
 
-API endpoints:
-- `GET /properties/{propertyId}/analytics/pages?url={pageUrl}` — Page metrics
-- `GET /properties/{propertyId}/heatmaps?url={pageUrl}` — Heatmap data
-- `GET /properties/{propertyId}/analytics/events?url={pageUrl}` — Page events
-- `GET /properties/{propertyId}/tests` — Existing tests
+API endpoints (all under `/api/external/v1/`, all take `start`, `end`, `timezone`):
+- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country, scroll depth, bounce)
+- `GET /properties/{propertyId}/clicks/details?page=/path` — Click data with UTM attribution (the public API has no `/heatmaps` endpoint; click data is the closest analogue)
+- `GET /properties/{propertyId}/forms/details?page=/path` — Form submissions and conversion rates for that page (no generic events endpoint exists publicly)
+- `GET /properties/{propertyId}/split-tests` — List existing experiments. Optional `?status=active|complete`
 
 ### Step 2: Identify Test Opportunities
 
@@ -128,22 +128,17 @@ Present this clearly:
 
 ### Step 5: Define Test Configuration
 
-Create the complete test spec for Humblytics:
+Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The required body shape is:
 
 ```json
 {
   "name": "descriptive-test-name",
-  "pageUrl": "/pricing",
-  "hypothesis": "Changing CTA from 'Start Free Trial' to 'See Your Analytics' will increase clicks because heatmap shows users hesitate at commitment language",
+  "page": "/pricing",
+  "type": "nocode",
   "variants": [
+    { "label": "control", "changes": [] },
     {
-      "name": "control",
-      "weight": 50,
-      "changes": []
-    },
-    {
-      "name": "variant-a",
-      "weight": 50,
+      "label": "variant-a",
       "changes": [
         {
           "selector": "#hero-cta",
@@ -153,30 +148,26 @@ Create the complete test spec for Humblytics:
       ]
     }
   ],
-  "primaryGoal": {
-    "type": "event",
-    "event": "signup_started"
-  },
-  "secondaryGoals": [
-    { "type": "event", "event": "cta_clicked" },
-    { "type": "metric", "metric": "bounce_rate" }
-  ],
-  "trafficAllocation": 100,
-  "minimumSampleSize": 2400,
-  "significanceLevel": 0.95
+  "goal": "signup_started",
+  "auto_stop_days": 30
 }
 ```
+
+Required fields: `name`, `page`, `type` (use `"nocode"` for selector-based tests), `variants` (each with `label` + `changes`).
+Optional: `goal` (primary conversion event), `auto_stop_days` (auto-end the test after N days).
 
 ### Step 6: Launch or Document
 
 **To launch via API:**
-- `POST /properties/{propertyId}/tests` — Create and start the test
-- `GET /properties/{propertyId}/tests/{testId}` — Monitor test status
-- `GET /properties/{propertyId}/tests/{testId}/results` — Pull results
+- `POST /properties/{propertyId}/split-tests` — Create and start the test (body shape above)
+- `GET /properties/{propertyId}/split-tests/{experimentId}` — Experiment details with per-variant metrics inline (no separate `/results` endpoint — variant metrics come back in the same response)
+- `PATCH /properties/{propertyId}/split-tests/{experimentId}` — Update an active experiment. Body: `{ "name": "...", "auto_stop_days": N }`
+- `POST /properties/{propertyId}/split-tests/{experimentId}/stop` — Stop a running experiment. Body: `{ "reason": "..." }`
+- `GET /properties/{propertyId}/split-test-recommendations?page=/path` — AI-generated split-test suggestions for a page
 
 **To document for manual launch:**
 - Output the full test specification
-- Include screenshot annotations if heatmap data informed the test
+- Include screenshot annotations if click-data informed the test
 - Provide the hypothesis document for the team
 
 ## Test Type Selection Guide
@@ -247,3 +238,19 @@ For each generated test, present:
 - **page-cro** — Deep page-level audit to inform test hypotheses
 - **copywriting** — Generate high-quality copy variants for tests
 - **funnel-reporter** — Track how test results affect downstream funnel metrics
+
+## Shared Frameworks (REQUIRED reading)
+
+Test design without grounding in base rates produces overconfident projections. Read these before generating test configs.
+
+- **`_shared/frameworks/base-rate-priors.md`** — load-bearing for this skill. Anchor expected impact against:
+  - **Only ~14% of CTA tests reach significance** (VWO/Wingify 2023 across thousands of tests)
+  - **~31% of headline rewrites beat control** (73-test study)
+  - Avg lift when a test wins: +49% — but most tests don't win
+  - If you propose 10 tests, expect 2–3 to win meaningfully. Frame the roadmap that way.
+- **`_shared/frameworks/ice-confidence-rubric.md`** — anchor Confidence on evidence quality from `_shared/benchmarks/patterns.json`, not on test-designer enthusiasm. 9–10 requires ≥2 independent sources with n≥1000 in the target vertical.
+- **`_shared/frameworks/anti-patterns.md`** — critical pitfalls when designing tests:
+  - **"Always multi-step" forms**: Baymard 2024 — step count exerts substantially less impact than total field count. A 15-field three-step form is worse than an 11-field three-step. Reduce fields BEFORE proposing step splits.
+  - **Bundled changes masquerading as a single test**: a "headline" test that also moves the sub-headline, image, and CTA isn't a headline test. Strict isolation matters when projecting future lift.
+  - **Underpowered tests stopped at the first peak**: regression-to-mean is severe in low-sample tests. Hold to the pre-computed sample size.
+- **`_shared/benchmarks/patterns.json`** — when generating a test config, find the matching `pattern_id` and use the evidence-backed `lift_range_pct` as the basis for the Expected Impact field. Don't quote the +260% Docsend outlier — quote the median.

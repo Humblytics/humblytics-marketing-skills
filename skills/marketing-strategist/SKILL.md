@@ -140,6 +140,8 @@ For any launch or channel, define:
 
 ### Growth Model Template
 
+> Note: MRR/revenue/CAC/LTV come from a billing source (Stripe/ChartMogul), not Humblytics — Humblytics returns revenue=0 unless a revenue connector is attached.
+
 Build a simple growth model:
 
 ```

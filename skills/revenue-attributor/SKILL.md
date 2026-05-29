@@ -10,7 +10,7 @@ metadata:
 
 ## Purpose
 
-Connect ad spend to actual Stripe revenue using Humblytics multi-touch attribution. Rank campaigns by real ROAS (not clicks, not conversions — *revenue*), surface ad waste, and generate reallocation recommendations. This skill moves marketing teams from vanity metrics to revenue accountability.
+Connect ad spend to on-site conversion signals using Humblytics attribution, and rank campaigns by spend efficiency (sessions and `ad_conversions` per dollar). True revenue/ROAS, `revenue_conversions`, and `trial_count` are only populated when a Stripe/ChartMogul revenue connector is attached to the property — without one, those fields are `0`. For true ROAS, join Humblytics spend + on-site conversion data to Stripe/ChartMogul revenue separately. This skill moves marketing teams from raw click counts to spend efficiency, and to revenue accountability once a revenue connector is in place.
 
 ## When to Use
 
@@ -76,7 +76,7 @@ For pausing laggards, shifting budget, or other write actions, point the user at
 
 - `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
 
-This returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions`, `revenue_conversions`, `revenue`, `roas`, `true_cpa`, plus `unmatched_ad_campaigns` (UTM hygiene gaps) and `unmatched_utm_campaigns` (organic/email traffic). Empty `campaigns[]` with non-empty `unmatched_*` is the strongest signal that UTM tagging needs work — the data is flowing, it just isn't joining.
+This returns per-campaign rows with `campaign`, `utm_campaign`, `platforms`, `target_urls`, `top_landing_page`, `spend`, `impressions`, `clicks`, `sessions`, `ad_conversions`, `revenue_conversions`, `revenue`, `roas`, `trial_count`, `true_cpa`, `cost_per_trial`, `click_to_session_rate`, `avg_hours_to_convert`, plus top-level `totals`, `unmatched_ad_campaigns` (UTM hygiene gaps), `unmatched_utm_campaigns` (organic/email traffic), `breakdowns`, `date_range`, and `connections`. NOTE revenue and roas are 0/null on properties without a revenue connector. Empty `campaigns[]` with non-empty `unmatched_*` is the strongest signal that UTM tagging needs work — the data is flowing, it just isn't joining.
 
 **Spend supplement (Path A — connectors connected):**
 
@@ -87,7 +87,7 @@ This returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions`
 
 **Context endpoints** for source/page-level breakdowns:
 
-- `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions
+- `GET /api/external/v1/properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions
 - `GET /properties/{propertyId}/forms/breakdown` — Conversion events (signups, purchases)
 - `GET /properties/{propertyId}/pages/breakdown` — Page performance (the public API doesn't expose a `page_group` filter; pull all pages and filter client-side if needed)
 
@@ -104,6 +104,8 @@ For each source → campaign → ad level:
 | organic | seo-longtail | $0 | 860 | 31 | $3,720 | ∞ |
 
 ### Step 3: ROAS Ranking + Waste Detection
+
+**Precondition — only tier by ROAS when `totals.revenue != 0`.** If `revenue` is `0` across all campaigns (no Stripe/ChartMogul revenue connector attached), do NOT tier or recommend kills by ROAS. Instead, report `spend` plus on-site conversion signals (`sessions`, `ad_conversions`) and explicitly flag that revenue attribution is unavailable until a revenue connector is connected. Only apply the tier table below once `totals.revenue != 0`.
 
 Sort campaigns into four tiers:
 
@@ -194,10 +196,14 @@ TRACKING GAPS:
 
 ## Creative Inspection (Path A only)
 
-When `ads-attribution` flags a high-spend / low-revenue Meta campaign, drill into the underlying creative before recommending kill:
+When `ads-attribution` flags a high-spend Meta campaign, drill into the underlying creative before recommending action. `ads-attribution` does NOT return Meta's internal campaign IDs, so you must first resolve the connection and campaign IDs from `meta-connections` — the ads call requires a real Meta `campaignId`, not the `utm_campaign` string (an unknown/fake id returns a Graph API "object does not exist" error). Verified live flow (2026-05-29):
 
-- `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — list ads in the campaign with creative + destination URL
-- `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata for one ad
+1. `GET /api/meta-connections` → take the connection `id` (and `adAccounts[].id`).
+2. `GET /api/meta-connections/{id}/campaigns` → list campaigns per account with their real Meta `id`, `name`, `status`. (Equivalently `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns`.) Match the flagged `utm_campaign`/name to its Meta campaign `id`.
+3. `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — list ads in that campaign with creative (`thumbnailUrl`, `imageUrl`, title, body), `status`, `adsetId`, destination URL.
+4. `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata (name, title, body, etc.) for one ad.
+
+Note: `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns/{campaignId}/ads` and `.../accounts/{accountId}/ads` are NOT valid — they fall through to the SPA and return an HTML page (`<!doctype html>`), not JSON. Use the connection-level `/campaigns/{campaignId}/ads` path above.
 
 Look for: destination URL mismatch (ad copy promises X, lands on Y), broken links, low-quality stock visuals, or one ad in the campaign hogging the spend with poor performance. This is the read-only diagnostic step. To pause the ad, hand off to Meta CLI (Path B).
 

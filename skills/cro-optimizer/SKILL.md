@@ -1,6 +1,6 @@
 ---
 name: cro-optimizer
-description: "CRO specialist that pulls live analytics data from Humblytics API, analyzes conversion funnels, identifies drop-off points, and generates prioritized A/B test hypotheses. Use when analyzing conversion rates, diagnosing funnel leaks, optimizing signup flows, or creating test roadmaps. Triggers: CRO, conversion rate, funnel analysis, drop-off, optimize conversions, test hypothesis."
+description: "CRO specialist that pulls live analytics data via the Humblytics MCP, analyzes conversion funnels, identifies drop-off points, and generates prioritized A/B test hypotheses. Use when analyzing conversion rates, diagnosing funnel leaks, optimizing signup flows, or creating test roadmaps. Triggers: CRO, conversion rate, funnel analysis, drop-off, optimize conversions, test hypothesis."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -10,7 +10,7 @@ metadata:
 
 ## Purpose
 
-Analyze conversion funnels using live Humblytics analytics data, identify the highest-impact drop-off points, and generate prioritized A/B test hypotheses with expected conversion-rate / volume impact. This skill turns raw analytics into a ranked optimization roadmap.
+Analyze conversion funnels using live Humblytics analytics (via the Humblytics MCP), identify the highest-impact drop-off points, and generate prioritized A/B test hypotheses with expected conversion-rate / volume impact. This skill turns raw analytics into a ranked optimization roadmap.
 
 ## When to Use
 
@@ -23,49 +23,42 @@ Analyze conversion funnels using live Humblytics analytics data, identify the hi
 
 ## Credentials
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+Live data comes from the **Humblytics MCP** (server `humblytics`). Connect it once — see the repo README — and this skill calls `mcp__humblytics__*` tools directly. No API keys, base URLs, or `.env` plumbing live in the skill.
 
-Setup (one time):
-1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
-2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
-3. Get the key from Humblytics Dashboard > Settings > API
-4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
-
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
+- **Never paste API keys into chat** — they persist in transcripts and logs. Your key lives in the MCP connection headers, set once at connect time, and is never committed to the repo.
+- **Property**: the MCP auto-resolves your property for a single-property key (the common case). For a multi-property key, call `list_properties` and pass the `propertyId` you want to analyze.
 - **Docs**: https://docs.humblytics.com/api
-
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
 
 ## Before You Start
 
-1. **Confirm the property ID** — Ask the user which Humblytics property to analyze
+1. **Confirm the property** — The MCP auto-resolves the property for a single-property key. If the key covers multiple properties, call `list_properties` and confirm which one to analyze.
 2. **Identify the funnel** — Clarify which conversion flow to examine (e.g., homepage > pricing > signup > onboarding)
 3. **Check for context** — Look for existing project docs, AGENTS.md, or product briefs that describe the business model, target audience, and current conversion goals
 4. **Establish the time range** — Default to last 30 days; ask if the user wants a different window
-5. **Confirm API access** — Verify `HUMBLYTICS_API_KEY` is available as an environment variable
+5. **Confirm MCP access** — Verify the Humblytics MCP (server `humblytics`) is connected before pulling data
 
 ## Core Workflow
 
 ### Step 1: Pull Funnel Data
 
-Retrieve analytics data from the Humblytics API:
+Live data comes from the Humblytics MCP — the relevant tools here are `get_pages_breakdown`, `get_page_details`, `query_funnel`, `get_funnel_sankey`, `get_forms_breakdown`, and `get_clicks_details`. Retrieve:
 
 - **Page views and sessions** for each step in the funnel
 - **Event data** for key conversion actions (signups, clicks, form submissions)
 - **Device and source breakdowns** to identify segment-specific issues
-- **Scroll depth via `pages/details`** and **click density via `clicks/details`** (no `/heatmaps` endpoint exists) for high-traffic pages
+- **Scroll depth via `get_page_details`** and **click density via `get_clicks_details`** (there is no heatmap tool) for high-traffic pages
 
-Use the Humblytics public API endpoints. All sit under base `/api/external/v1/` and take `start`, `end`, `timezone` query params:
+The analytics tools take `start`, `end` (ISO-8601), and `timezone`:
 
-- `GET /properties/{propertyId}/pages/breakdown` — Page-level traffic across the site
-- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country breakdowns, scroll depth)
-- `GET /properties/{propertyId}/funnels?steps={JSON}` — Funnel step data; the `steps` param is a JSON array describing each step. Optional: `mode=unbounded|sequential`, `breakdownBy`
-- `GET /properties/{propertyId}/funnels/sankey?steps={JSON}` — Sankey path diagram for the same funnel
+- `get_pages_breakdown` — Page-level traffic across the site
+- `get_page_details` (`page: "/path"`) — Single-page deep dive (UTM, device, country breakdowns, scroll depth)
+- `query_funnel` (`steps: [{ page: "/" }, ...]`) — Funnel step data. Optional: `mode: "unbounded" | "sequential"`, `breakdownBy`
+- `get_funnel_sankey` (same `steps`) — Sankey path diagram for the same funnel
 
-> **Fallback when funnels are down.** `funnels` and `funnels/sankey` currently return HTTP 500 (verified live 2026-05-29). If they return 500 (or otherwise fail), approximate the funnel from the endpoints that do work: pull per-step page volume from `pages/breakdown` (and `funnels/suggestions?page=/path` for the ranked next-page sequence), and pull conversion-event volume for the final step(s) from `forms/breakdown`. Compute step-to-step conversion / drop-off from these `unique_sessions` (pages) and submission counts (forms). Note in your output that the funnel is an approximation from page + form breakdowns because the native funnel endpoint was unavailable.
-- `GET /properties/{propertyId}/forms/breakdown` and `forms/details?page=/path` — Form/conversion event data (the public API doesn't expose a generic `events` endpoint)
-- `GET /properties/{propertyId}/clicks/details?page=/path` — Click heatmap data for a specific page (no top-level `/heatmaps` endpoint exists; click data is the closest analogue)
-- `GET /properties/{propertyId}/clicks/breakdown` — Cross-page click comparison
+> **Fallback when funnels are down.** `query_funnel` and `get_funnel_sankey` can return HTTP 500. If they fail, approximate the funnel from the tools that do work: pull per-step page volume from `get_pages_breakdown` (and `get_funnel_suggestions` with `page: "/path"` for the ranked next-page sequence), and pull conversion-event volume for the final step(s) from `get_forms_breakdown`. Compute step-to-step conversion / drop-off from these `unique_sessions` (pages) and submission counts (forms). Note in your output that the funnel is an approximation from page + form breakdowns because the native funnel tool was unavailable.
+- `get_forms_breakdown` and `get_forms_details` (`page: "/path"`) — Form/conversion event data (there is no generic `events` tool)
+- `get_clicks_details` (`page: "/path"`) — Click heatmap data for a specific page (no heatmap tool exists; click data is the closest analogue)
+- `get_clicks_breakdown` — Cross-page click comparison
 
 ### Step 2: Map the Funnel
 
@@ -98,11 +91,11 @@ For each high-drop-off step, investigate:
 - **Page load time** — Slow pages kill conversions. Check if the step has performance issues.
 - **Mobile vs desktop** — Is the drop-off concentrated on mobile? Layout/UX issue.
 - **Traffic source** — Do certain acquisition channels show higher drop-off? Expectation mismatch.
-- **Scroll depth** — Are users seeing the CTA? Check scroll depth via `pages/details` and click density via `clicks/details` (no `/heatmaps` endpoint exists).
+- **Scroll depth** — Are users seeing the CTA? Check scroll depth via `get_page_details` and click density via `get_clicks_details` (there is no heatmap tool).
 - **Click patterns** — Are users clicking non-interactive elements? Confusing UI.
 - **Form fields** — For forms, which field has the highest abandonment rate?
 
-When the leak appears concentrated in **paid traffic** (drop-off significantly worse for `utm_source=google` or `utm_source=facebook` than for organic), pull `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=&endDate=` to see which specific campaigns are landing on the underperforming page. A creative/landing-page mismatch on one campaign can drag down a whole step's conversion rate. Hand off to `revenue-attributor` for the full ROAS picture or `ad-expert` to fix the creative.
+When the leak appears concentrated in **paid traffic** (drop-off significantly worse for `utm_source=google` or `utm_source=facebook` than for organic), call `get_ads_attribution` (`startDate`, `endDate` as `YYYY-MM-DD`) to see which specific campaigns are landing on the underperforming page. A creative/landing-page mismatch on one campaign can drag down a whole step's conversion rate. Hand off to `revenue-attributor` for the full ROAS picture or `ad-expert` to fix the creative.
 
 ### Step 5: Generate Test Hypotheses
 

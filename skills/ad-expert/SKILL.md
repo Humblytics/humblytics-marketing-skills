@@ -125,35 +125,44 @@ Campaign (budget + settings)
 
 ## Pulling Live Campaign Data from Humblytics
 
-If the workspace has Meta or Google Ads connected at **Connectors** in the Humblytics dashboard, query existing campaigns before making recommendations — don't suggest in a vacuum. All endpoints below accept the same Bearer `HUMBLYTICS_API_KEY` the rest of the public API uses.
+Live campaign data comes from the **Humblytics MCP** (server `humblytics` — see the repo README to connect it). If the workspace has Meta or Google Ads connected at **Connectors** in the Humblytics dashboard, query existing campaigns before making recommendations — don't suggest in a vacuum. The MCP handles auth, base URL, and property resolution; you just call the `mcp__humblytics__*` tools below.
 
-**Guard:** a `200` response whose body starts with `<!doctype html>` is the SPA single-page-app fallback (a broken/wrong endpoint), **not data** — treat it as a failed call, not an empty result.
+There are three ways to touch ads data — keep them straight:
 
-**Meta Ads** (base `/api/`):
+**Path A — Humblytics connectors (READS via the MCP).** Pull whatever Meta/Google Ads has already synced into the workspace. Read-only.
 
-- `GET /api/meta-connections?propertyId={propertyId}` — list connections
-- `GET /api/meta-connections/{id}/status` — connection health + token expiry
-- `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns?since=&until=` — campaigns with performance metrics
-- `GET /api/meta-connections/{id}/accounts/{accountId}/daily-insights?since=&until=` — daily spend, impressions, clicks per campaign
-- `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — ads within a campaign (creative + destination URL)
-- `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata for one ad
+**Path B — Meta's official `meta ads` CLI (WRITES).** The only sanctioned way to pause campaigns or change budgets. Creates resources in `PAUSED` status by default; scope the access token to a single ad account; never store it in `CLAUDE.md`.
 
-**Google Ads** (base `/api/`):
+**Path C — don't roll your own.** **Do not** route production ad-platform traffic through an unapproved Meta developer app — that is the documented ban pattern Meta is actively enforcing.
 
-- `GET /api/google-ads-connections?propertyId={propertyId}` — list connections
-- `GET /api/google-ads-connections/{id}` — single connection with customer accounts
-- `GET /api/google-ads-connections/{id}/campaigns?customerId={customerId}` — campaigns for a customer account, **metadata only** (`id`, `name`, `status`, `channelType` — no spend/metrics). For Google spend, use `ads-attribution`.
+The MCP is **read-only for ads** — it never pauses campaigns or changes budgets. All management actions hand off to Path B.
 
-**Full-funnel attribution** (base `/api/v1/`):
+**Meta Ads (Path A reads):**
 
-- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=&endDate=` (camelCase dates, `YYYY-MM-DD`) — per-campaign `spend`, `impressions`, `clicks`, `sessions` (these are real, sourced from the ad platforms). `revenue`, `revenue_conversions`, `trial_count`, and `roas` are **only populated if a revenue connector (Stripe / ChartMogul) is attached** to the property — otherwise they return `0`/`null`. Do not present revenue as "joined across Meta + Google + Stripe" by default; for true revenue/ROAS, route to the billing source (Stripe / ChartMogul) rather than treating these fields as guaranteed.
+- `list_meta_connections` — list connections
+- `get_meta_connection_status(id)` — connection health + token expiry
+- `list_meta_campaigns(id)` — campaigns for a connection
+- `list_meta_account_campaigns(id, accountId, since, until)` (dates `YYYY-MM-DD`) — campaigns with performance metrics for an ad account
+- `get_meta_daily_insights(id, accountId, since, until)` (dates `YYYY-MM-DD`) — daily spend, impressions, clicks per campaign
+- `list_meta_campaign_ads(id, campaignId)` — ads within a campaign (creative + destination URL)
+- `get_meta_ad_creative(id, adId)` — full creative metadata for one ad
 
-**Read-only.** These endpoints don't let the agent pause campaigns or change budgets. For management actions, hand off to Meta's official `meta ads` CLI (creates resources in `PAUSED` status by default; scope the access token to a single ad account; never store it in `CLAUDE.md`). **Do not** route production ad-platform traffic through an unapproved Meta developer app — that is the documented ban pattern Meta is actively enforcing.
+**Google Ads (Path A reads):**
+
+- `list_google_ads_connections` — list connections
+- `get_google_ads_connection(id)` — single connection with customer accounts
+- `list_google_ads_campaigns(id, customerId)` — campaigns for a customer account, **metadata only** (`id`, `name`, `status`, `channelType` — no spend/metrics). For Google spend, use `get_ads_attribution`.
+
+**Full-funnel attribution:**
+
+- `get_ads_attribution(startDate, endDate)` (dates `YYYY-MM-DD`) — per-campaign `spend`, `impressions`, `clicks`, `sessions` (these are real, sourced from the ad platforms). `revenue`, `revenue_conversions`, `trial_count`, and `roas` are **only populated if a revenue connector (Stripe / ChartMogul) is attached** to the property — otherwise they return `0`/`null`. Do not present revenue as "joined across Meta + Google + Stripe" by default; for true revenue/ROAS, route to the billing source (Stripe / ChartMogul) rather than treating these fields as guaranteed.
+
+For landing-page performance behind the ads, read `get_pages_breakdown` / `get_page_details` (the pages a campaign drives traffic to) and `get_traffic_breakdown` (channel/source mix) from the same MCP.
 
 When inspecting an underperforming campaign:
-1. Hit `ads-attribution` to confirm the campaign is actually spending (`spend > 0`) but not driving sessions/conversions (vs. a UTM tagging issue). **Do not** diagnose "spending without revenue" off the `revenue`/`roas` fields unless a revenue connector is attached — on a property with no Stripe/ChartMogul connector those fields are structurally `0` for every campaign, so a zero-revenue reading is meaningless, not a red flag. Use `clicks`/`sessions`/`ad_conversions` (and the billing source for actual revenue) to judge performance.
-2. List the campaign's ads via `/api/meta-connections/{id}/campaigns/{campaignId}/ads`.
-3. Pull the worst-performing ad's full creative via `/api/meta-connections/{id}/ads/{adId}`.
+1. Call `get_ads_attribution` to confirm the campaign is actually spending (`spend > 0`) but not driving sessions/conversions (vs. a UTM tagging issue). **Do not** diagnose "spending without revenue" off the `revenue`/`roas` fields unless a revenue connector is attached — on a property with no Stripe/ChartMogul connector those fields are structurally `0` for every campaign, so a zero-revenue reading is meaningless, not a red flag. Use `clicks`/`sessions`/`ad_conversions` (and the billing source for actual revenue) to judge performance.
+2. List the campaign's ads via `list_meta_campaign_ads(id, campaignId)`.
+3. Pull the worst-performing ad's full creative via `get_meta_ad_creative(id, adId)`.
 4. Diagnose: destination URL mismatch, weak hook in the first 1–2 seconds (video), generic stock imagery, copy that doesn't match landing-page promise.
 
 ## Ad Copy Frameworks

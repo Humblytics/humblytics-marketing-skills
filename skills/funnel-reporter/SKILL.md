@@ -21,24 +21,15 @@ Pull live analytics data from the Humblytics API to generate comprehensive funne
 - Preparing board or stakeholder updates with marketing metrics
 - Comparing period-over-period performance
 
-## Credentials
+## Connection
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+Live data comes from the **Humblytics MCP** (server `humblytics`). The skill calls `mcp__humblytics__*` tools — the MCP handles auth, base URL, and property resolution. Connect it once per the repo README; never paste API keys into chat. The API key lives in the MCP connection headers, set at connect time.
 
-Setup (one time):
-1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
-2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
-3. Get the key from Humblytics Dashboard > Settings > API
-4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
-
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Docs**: https://docs.humblytics.com/api
-
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
+Property: for a single-property key the MCP auto-resolves the property. For a multi-property key, call `list_properties` and pass `propertyId` to each tool.
 
 ## Before You Start
 
-1. **Confirm the property** — Which Humblytics property to report on
+1. **Confirm the property** — Which Humblytics property to report on (call `list_properties` if the key covers more than one)
 2. **Define the time period** — This week, last 30 days, month-over-month, quarter, custom range
 3. **Identify the audience** — Is this for the team, leadership, investors? This shapes detail level and framing.
 4. **Check for comparison period** — Most useful reports compare current vs previous period
@@ -49,14 +40,14 @@ If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.
 
 ### Step 1: Pull Traffic Data
 
-Retrieve top-of-funnel metrics from the Humblytics public API. All endpoints below sit under base `/api/external/v1/` and require `start`, `end`, and `timezone` query params (ISO 8601 datetimes + IANA timezone). Optional: `granularity` (`hour`/`day`/`month`) for time-series. NOTE: `granularity=week` is currently bugged on traffic/trends and returns all-zero buckets — use `day` and aggregate to weeks client-side instead.
+Retrieve top-of-funnel metrics via the Humblytics MCP traffic tools. They take `start`, `end` (ISO 8601 datetimes) and `timezone` (IANA). Optional: `granularity` (`hour`/`day`/`month`) for time-series. NOTE: `granularity=week` is currently bugged on `get_traffic_trends` and returns all-zero buckets — use `day` and aggregate to weeks client-side instead.
 
-**API Endpoints:**
-- `GET /properties/{propertyId}/traffic/summary` — Aggregate metrics (pageviews, sessions, bounce rate, avg session duration)
-- `GET /properties/{propertyId}/traffic/trends` — Timeseries pageviews & unique visitors (use `granularity=day`; avoid `week` — it returns all-zero buckets)
-- `GET /properties/{propertyId}/pages/breakdown` — Page-level performance: views, visitors, scroll depth, bounce rate
-- `GET /properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions, all from the same endpoint
-- `GET /properties/{propertyId}/traffic/entry-exit-pages` — Top entry and exit pages
+**MCP tools:**
+- `get_traffic_summary` — Aggregate metrics (pageviews, sessions, bounce rate, avg session duration)
+- `get_traffic_trends` — Timeseries pageviews & unique visitors (use `granularity=day`; avoid `week` — it returns all-zero buckets)
+- `get_pages_breakdown` — Page-level performance: views, visitors, scroll depth, bounce rate
+- `get_traffic_breakdown` — UTM source/medium/campaign + device + location dimensions, all from the same tool
+- `get_entry_exit_pages` — Top entry and exit pages
 
 **Key traffic metrics to pull:**
 - Total sessions and unique visitors
@@ -117,30 +108,30 @@ For each transition, report:
 
 ### Step 5: Conversion Events
 
-The public API doesn't expose a generic events endpoint — pull conversion data from the dedicated form and click endpoints instead:
+There's no generic events tool — pull conversion data from the dedicated form and click tools instead:
 
-- `GET /properties/{propertyId}/forms/breakdown` — All form submissions across pages
-- `GET /properties/{propertyId}/forms/details?page=/path` — Conversion rates for a specific form/page
-- `GET /properties/{propertyId}/clicks/breakdown` — Click data with top targets across all pages
-- `GET /properties/{propertyId}/clicks/details?page=/path` — Clicks on a specific page with UTM attribution
+- `get_forms_breakdown` — All form submissions across pages
+- `get_forms_details` (pass `page: "/path"`) — Conversion rates for a specific form/page
+- `get_clicks_breakdown` — Click data with top targets across all pages
+- `get_clicks_details` (pass `page: "/path"`) — Clicks on a specific page with UTM attribution
 
 Report on:
-- Signup completions (forms/breakdown filtered to signup pages)
-- CTA clicks (clicks/details by page and CTA target)
-- Form submissions (forms/breakdown)
-- Pricing page views (pages/details with `?page=/pricing`)
-- Trial starts (forms/breakdown filtered to the trial-start form)
-- Upgrade/purchase events (forms/breakdown filtered to checkout/purchase)
+- Signup completions (`get_forms_breakdown` filtered to signup pages)
+- CTA clicks (`get_clicks_details` by page and CTA target)
+- Form submissions (`get_forms_breakdown`)
+- Pricing page views (`get_page_details` with `page: "/pricing"`)
+- Trial starts (`get_forms_breakdown` filtered to the trial-start form)
+- Upgrade/purchase events (`get_forms_breakdown` filtered to checkout/purchase)
 
 ### Step 5.5: Attach Paid Attribution (when reporting paid channels, plus revenue/trial activations only when a revenue connector is attached — else 0)
 
-If the report needs to surface paid-channel performance, ROAS, or revenue-by-campaign, enrich the funnel with the Ads Attribution endpoint:
+If the report needs to surface paid-channel performance, ROAS, or revenue-by-campaign, enrich the funnel with the `get_ads_attribution` tool (pass `startDate` and `endDate` as `YYYY-MM-DD`):
 
-- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+- `get_ads_attribution` — per-campaign attribution rows
 
-Returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions` (always populated) plus `revenue`, `revenue_conversions`, `roas`, `trial_count` (these are 0 unless a revenue connector such as Stripe/ChartMogul is linked — do NOT report ROAS or revenue from this endpoint alone), and `unmatched_ad_campaigns` (UTM hygiene gaps) / `unmatched_utm_campaigns` (organic/email traffic). Pair with `traffic/breakdown` source data to build a paid-vs-organic split (spend/sessions only).
+Returns per-campaign rows with `spend`, `impressions`, `clicks`, `sessions` (always populated) plus `revenue`, `revenue_conversions`, `roas`, `trial_count` (these are 0 unless a revenue connector such as Stripe/ChartMogul is linked — do NOT report ROAS or revenue from this tool alone), and `unmatched_ad_campaigns` (UTM hygiene gaps) / `unmatched_utm_campaigns` (organic/email traffic). Pair with `get_traffic_breakdown` source data to build a paid-vs-organic split (spend/sessions only).
 
-Note the different base path — this endpoint sits under `/api/v1/`, not `/api/external/v1/`. Same Bearer `HUMBLYTICS_API_KEY`. For raw connector metadata (ad accounts, daily insights, ad creative), use `/api/meta-connections` and `/api/google-ads-connections` — see `revenue-attributor` for the full workflow.
+For raw connector metadata (ad accounts, daily insights, ad creative), use the meta/google MCP tools — `list_meta_connections`, `get_meta_daily_insights`, `list_google_ads_connections`, and related — see `revenue-attributor` for the full workflow.
 
 ### Step 6: Period-over-Period Comparison
 

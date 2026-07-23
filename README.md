@@ -6,7 +6,7 @@ These skills work with **Claude Code**, **Cursor**, **Windsurf**, **Cline**, and
 
 ## Skills
 
-### Live-data skills (connect to Humblytics API)
+### Live-data skills (connect to the Humblytics MCP)
 
 | Skill | Description |
 |-------|-------------|
@@ -45,23 +45,64 @@ git clone https://github.com/Humblytics/humblytics-marketing-skills.git
 
 Copy the relevant `SKILL.md` files into your project's `.cursor/skills/` or equivalent directory, or point your assistant at this repository.
 
-## API-Connected Skills
+## Live-data skills — connect the Humblytics MCP
 
-Several skills connect to the Humblytics API for live data. Before using them:
+The five live-data skills read your analytics through the **Humblytics MCP server** — a remote [Model Context Protocol](https://modelcontextprotocol.io) server that exposes ~36 tools (`get_traffic_summary`, `query_funnel`, `create_split_test`, `get_ads_attribution`, the Meta/Google connection tools, and more). The skills call these tools directly; there is no API key to paste into a URL and no base URL to manage — the MCP handles auth, routing, and property resolution.
 
-1. Sign up at [app.humblytics.com](https://app.humblytics.com) and grab your API key + Property ID from **Dashboard > Settings > API**
-2. Copy the template: `cp .env.example .env`
-3. Fill in `HUMBLYTICS_API_KEY` (and optionally `HUMBLYTICS_PROPERTY_ID`) in `.env`
-4. Load it into your shell before running the agent: `source .env` (or use `direnv`, or add the exports to your shell profile)
+| | |
+|---|---|
+| **Server name** | `humblytics` |
+| **URL** | `https://mcp.humblytics.com/mcp` |
+| **Transport** | Streamable HTTP |
+| **Auth headers** | `Authorization: Bearer $HUMBLYTICS_API_KEY` and `X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID` |
 
-The `.env` file is gitignored by convention — **never commit it**, and **never paste API keys directly into the agent chat**. Keep `HUMBLYTICS_API_KEY` out of `CLAUDE.md`, `.cursorrules`, and any file that gets committed to git. Skills read credentials from the environment; that's the only safe path.
+### 1. Get your key
 
-The same property-scoped Bearer key authorizes all three API bases:
-- `https://app.humblytics.com/api/external/v1` — traffic, pages, forms, clicks, funnels, split tests
-- `https://app.humblytics.com/api/v1` — ads-attribution
-- `https://app.humblytics.com/api` — meta-connections, google-ads-connections
+Sign up at [app.humblytics.com](https://app.humblytics.com) and grab your **API key** + **Property ID** from **Dashboard > Settings > API**. Your key looks like `hmb_…`.
 
-See the [Humblytics Agent Documentation](https://app.humblytics.com/agent.md) for the full API reference.
+> **Your API key is a secret.** Keep it out of `CLAUDE.md`, `.cursorrules`, `AGENTS.md`, chat messages, and anything committed to git. Store it in an environment variable and reference it as `$HUMBLYTICS_API_KEY`. Put the two lines in a gitignored `.env` (`cp .env.example .env`) and `source .env` before you register the server.
+
+### 2. Register the server
+
+**Claude Code**
+
+```bash
+claude mcp add humblytics --transport http https://mcp.humblytics.com/mcp \
+  --header "Authorization: Bearer $HUMBLYTICS_API_KEY" \
+  --header "X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID"
+```
+
+**Cursor / Windsurf / Cline** (and any client with remote HTTP MCP support) — add to your MCP config (e.g. `.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "humblytics": {
+      "url": "https://mcp.humblytics.com/mcp",
+      "headers": {
+        "Authorization": "Bearer ${HUMBLYTICS_API_KEY}",
+        "X-Humblytics-Property-Id": "${HUMBLYTICS_PROPERTY_ID}"
+      }
+    }
+  }
+}
+```
+
+**Codex CLI** — add to `~/.codex/config.toml`:
+
+```toml
+[mcp_servers.humblytics]
+url = "https://mcp.humblytics.com/mcp"
+http_headers = { "Authorization" = "Bearer ${HUMBLYTICS_API_KEY}", "X-Humblytics-Property-Id" = "${HUMBLYTICS_PROPERTY_ID}" }
+```
+
+### 3. Verify
+
+Ask your agent to list the `humblytics` server's tools (you should see ~36) and call `get_traffic_realtime` with no arguments. If tools don't appear, confirm `$HUMBLYTICS_API_KEY` is set in the environment the client launched from and reload the client.
+
+The fastest path is the dashboard: when you create an API key, the **key-created dialog** on the API Access page gives you a one-click "Copy MCP setup prompt" you can paste straight into your agent.
+
+> The context-only skills (page-cro, email-sequences, seo-strategist, marketing-strategist, copywriting, ad-expert, content-strategist) work without any connection. `ad-expert` will additionally pull live spend and attribution through the `humblytics` MCP when it's connected, but doesn't require it.
 
 ### Meta Ads and Google Ads — three paths
 

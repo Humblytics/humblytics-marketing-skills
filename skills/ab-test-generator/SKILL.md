@@ -1,6 +1,6 @@
 ---
 name: ab-test-generator
-description: "Reads page analytics and click data from Humblytics, generates A/B test hypotheses with element selectors, and launches no-code split tests via the Humblytics API. Use when creating A/B tests, split tests, multivariate tests, or when you need to test headlines, CTAs, layouts, or pricing. Triggers: A/B test, split test, experiment, test hypothesis, launch test, variant."
+description: "Reads page analytics and click data from Humblytics, generates A/B test hypotheses with element selectors, and launches no-code split tests via the Humblytics MCP. Use when creating A/B tests, split tests, multivariate tests, or when you need to test headlines, CTAs, layouts, or pricing. Triggers: A/B test, split test, experiment, test hypothesis, launch test, variant."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -10,37 +10,30 @@ metadata:
 
 ## Purpose
 
-Generate data-driven A/B test configurations from Humblytics analytics and heatmap data. This skill creates complete test definitions including hypotheses, variant specifications with CSS/element selectors, success metrics, sample size requirements, and can launch tests directly through the Humblytics API.
+Generate data-driven A/B test configurations from Humblytics analytics and heatmap data. This skill creates complete test definitions including hypotheses, variant specifications with CSS/element selectors, success metrics, sample size requirements, and can launch tests directly through the Humblytics MCP.
+
+Live data comes from the Humblytics MCP (server `humblytics`) — read tools like `get_page_details`, `get_clicks_details`, and `get_split_test_recommendations`, and write tools like `create_split_test`, `update_split_test`, and `stop_split_test`.
 
 ## When to Use
 
 - Creating A/B tests from conversion data or heatmap insights
 - Generating test hypotheses for a specific page or funnel step
-- Launching no-code split tests via the Humblytics testing API
+- Launching no-code split tests via the Humblytics MCP
 - Calculating required sample size and test duration
 - Designing multivariate test matrices
 - Reviewing and iterating on existing test results
 
-## Credentials
+## Setup
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+This skill calls the Humblytics MCP (server `humblytics`) for all live data and test launches — connect it once and the MCP handles auth, base URL, and property resolution. See the repo README for connection steps. The skill then calls `mcp__humblytics__*` tools directly; there is no per-run key to export.
 
-Setup (one time):
-1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
-2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
-3. Get the key from Humblytics Dashboard > Settings > API
-4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
-
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Docs**: https://docs.humblytics.com/api
-
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
+Keep the security ethos: **never paste API keys directly into chat** and never commit a `.env` — the key now lives in the MCP connection headers, set once. For a single-property key the MCP auto-resolves the property; for a multi-property key call `list_properties` and pass the `propertyId` you want.
 
 ## Before You Start
 
-1. **Confirm property and page** — Which Humblytics property and which page URL to test
-2. **Pull current data** — Retrieve page analytics, heatmap data, and current conversion rate
-3. **Check existing tests** — Look for any running tests to avoid conflicts
+1. **Confirm property and page** — Which page URL to test (the MCP resolves the property; use `list_properties` only for multi-property keys)
+2. **Pull current data** — Retrieve page analytics, click data, and current conversion rate via the MCP
+3. **Check existing tests** — Look for any running tests to avoid conflicts (`list_split_tests`)
 4. **Understand the goal** — What is the primary conversion action on this page?
 5. **Verify traffic volume** — Ensure enough traffic for statistical significance within a reasonable timeframe
 6. **Check for context** — Look for product briefs, AGENTS.md, or existing CRO documents that inform test direction
@@ -57,11 +50,11 @@ Pull data from Humblytics:
 - **Device split**: Mobile vs desktop behavior differences
 - **Source split**: How different traffic sources behave on this page
 
-API endpoints (all under `/api/external/v1/`, all take `start`, `end`, `timezone`):
-- `GET /properties/{propertyId}/pages/details?page=/path` — Single-page deep dive (UTM, device, country, scroll depth, bounce)
-- `GET /properties/{propertyId}/clicks/details?page=/path` — Click data with UTM attribution (the public API has no `/heatmaps` endpoint; click data is the closest analogue)
-- `GET /properties/{propertyId}/forms/details?page=/path` — Form submissions and conversion rates for that page (no generic events endpoint exists publicly)
-- `GET /properties/{propertyId}/split-tests` — List existing experiments. Optional `?status=active|complete`
+MCP tools (analytics reads take `start`, `end` (ISO-8601), and `timezone`):
+- `get_page_details` (page param) — Single-page deep dive (UTM, device, country, scroll depth, bounce)
+- `get_clicks_details` (page param) — Click data with UTM attribution (there is no heatmap endpoint; click data is the closest analogue)
+- `get_forms_details` (page param) — Form submissions and conversion rates for that page (no generic events tool exists)
+- `list_split_tests` — List existing experiments. Optionally filter by status (`active`/`complete`)
 
 ### Step 2: Identify Test Opportunities
 
@@ -128,7 +121,7 @@ Present this clearly:
 
 ### Step 5: Define Test Configuration
 
-Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The required body shape is:
+Create the test spec and pass it as the `create_split_test` tool input. The required shape is:
 
 ```json
 {
@@ -148,24 +141,26 @@ Create the test spec to send to `POST /properties/{propertyId}/split-tests`. The
       ]
     }
   ],
-  "goal": "signup_started",
+  "goal": "form_submission",
   "auto_stop_days": 30
 }
 ```
 
 Required fields: `name`, `page`, `type` (use `"a_b"` for selector-based tests; valid enum: `a_b`, `component_a_b`, `multivariate`, `component_multivariate`), `variants` (each with `label` + `changes`). Mark the control variant with `is_control: true` rather than relying on a magic label value like `"control"`.
-Optional: `goal` (primary conversion event), `auto_stop_days` (auto-end the test after N days).
+Optional: `goal` (primary conversion event), `auto_stop_days` (auto-end the test after N days, 1–30).
 
-> **TBD — confirm the `changes[]` schema against a live split-test create.** This skill documents `attribute: "textContent"`, but the internal `cro-lead` skill uses `op: "text"`. The exact shape (`attribute` vs `op`, and the allowed values) has not been verified against a live create call here — treat it as unconfirmed and validate before relying on it.
+`goal` enum: `click_through`, `form_submission`, `bounce_rate`, `session_time`, `destination_page`, `external_destination`, `revenue`. A plain "conversion" goal maps to `form_submission`. The `revenue` goal requires a connected revenue source (e.g. a Stripe/revenue connector) — don't select it unless revenue tracking is live for the property.
+
+> **TBD — confirm the `changes[]` schema against a live `create_split_test` call.** This skill documents `attribute: "textContent"`, but some tooling uses `op: "text"`. The exact shape (`attribute` vs `op`, and the allowed values) has not been verified against a live create here — treat it as unconfirmed and validate before relying on it.
 
 ### Step 6: Launch or Document
 
-**To launch via API:**
-- `POST /properties/{propertyId}/split-tests` — Create and start the test (body shape above)
-- `GET /properties/{propertyId}/split-tests/{experimentId}` — Experiment details with per-variant metrics inline (no separate `/results` endpoint — variant metrics come back in the same response)
-- `PATCH /properties/{propertyId}/split-tests/{experimentId}` — Update an active experiment. Body: `{ "name": "...", "auto_stop_days": N }`
-- `POST /properties/{propertyId}/split-tests/{experimentId}/stop` — Stop a running experiment. Body: `{ "reason": "..." }`
-- `GET /properties/{propertyId}/split-test-recommendations?page=/path` — AI-generated split-test suggestions for a page
+**To launch via the MCP:**
+- `create_split_test` — Create and start the test (input shape above)
+- `get_split_test` (id) — Experiment details with per-variant metrics inline (no separate results call — variant metrics come back in the same response). Only act on a variant once its confidence is >= 70.
+- `update_split_test` (id) — Update an active experiment. Input: `{ "name": "...", "auto_stop_days": N }` (1–30)
+- `stop_split_test` (id) — Stop a running experiment. Input: `{ "reason": "..." }`
+- `get_split_test_recommendations` (page param) — AI-generated split-test suggestions for a page
 
 **To document for manual launch:**
 - Output the full test specification

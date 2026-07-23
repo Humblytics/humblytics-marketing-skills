@@ -21,36 +21,25 @@ Connect ad spend to on-site conversion signals using Humblytics attribution, and
 - Building a quarterly ad performance review for leadership
 - Deciding whether to kill, scale, or hold a specific campaign
 
-## Credentials
+## Connecting Humblytics
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs. Keep `HUMBLYTICS_API_KEY` out of `CLAUDE.md`, `.cursorrules`, and any file that gets committed to git.
+Live data comes from the **Humblytics MCP** (server `humblytics`). This skill calls `mcp__humblytics__*` tools — `get_ads_attribution`, `list_meta_connections`, `get_meta_daily_insights`, `list_google_ads_connections`, and friends — so there are no base URLs, curl calls, or API keys to wire up here. Connect the MCP once (see the repo README); the API key lives in the connection headers, set a single time.
 
-Setup (one time):
-1. `cp .env.example .env` at the repo root and fill in `HUMBLYTICS_API_KEY`
-2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
-3. Get the key from Humblytics Dashboard > Settings > API
-4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
-
-- **Bases used by this skill** (all accept the same Bearer `HUMBLYTICS_API_KEY`):
-  - `https://app.humblytics.com/api/external/v1` — traffic, pages, forms, clicks, funnels
-  - `https://app.humblytics.com/api/v1` — ads-attribution
-  - `https://app.humblytics.com/api` — meta-connections, google-ads-connections
-- **Docs**: https://docs.humblytics.com/api
-- **Stripe requirement**: The Humblytics property must have Stripe connected for revenue attribution to work. No separate Stripe key is needed here — Humblytics handles Stripe ingestion internally.
-
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` — do not accept the key in chat.
+- **Never paste API keys into chat** — they persist in transcripts and logs. The key belongs in the MCP connection config, never in `CLAUDE.md`, `.cursorrules`, or any file committed to git.
+- **Property**: for a single-property key the MCP auto-resolves the property, so nothing to pass. For a multi-property key, call `list_properties` and pass the chosen `propertyId`.
+- **Stripe/ChartMogul requirement**: the Humblytics property must have a Stripe/ChartMogul revenue connector attached for revenue attribution to populate. No separate Stripe key is needed here — Humblytics handles ingestion internally. Without a revenue connector, `revenue`, `roas`, `revenue_conversions`, and `trial_count` come back `0`.
 
 ### Three paths to ad data (Meta Ads + Google Ads)
 
 #### Path A — Humblytics connectors (preferred, read-only)
 
-If the property has Meta Ads or Google Ads connected at **Connectors** in the Humblytics dashboard, this skill pulls campaign metadata, daily insights, and full-funnel attribution directly through the public API — no Meta App Review, no Google Ads developer token. This is the default path. The connectors are **read-only** — they let the agent see campaign data and revenue, but not pause campaigns or change budgets.
+If the property has Meta Ads or Google Ads connected at **Connectors** in the Humblytics dashboard, this skill pulls campaign metadata, daily insights, and full-funnel attribution directly through the Humblytics MCP — no Meta App Review, no Google Ads developer token. This is the default path. The connectors are **read-only** — they let the agent see campaign data and revenue, but not pause campaigns or change budgets.
 
-- Detect availability via `GET /api/meta-connections?propertyId=` and `GET /api/google-ads-connections?propertyId=`. Empty `connections` arrays mean nothing is connected; fall back to Path A2 below.
+- Detect availability via `list_meta_connections` and `list_google_ads_connections`. Empty `connections` arrays mean nothing is connected; fall back to Path A2 below.
 
 #### Path A2 — User-provided CSV (fallback)
 
-If no connectors are set up, the skill asks the user to paste ad spend from Meta Ads Manager or Google Ads Editor. Pair the CSV columns with Humblytics-attributed revenue from `ads-attribution` (which still works for revenue even without a spend connector — it just leaves spend fields zero).
+If no connectors are set up, the skill asks the user to paste ad spend from Meta Ads Manager or Google Ads Editor. Pair the CSV columns with Humblytics-attributed revenue from `get_ads_attribution` (which still works for revenue even without a spend connector — it just leaves spend fields zero).
 
 #### Path B — Meta CLI (only when the agent needs to *manage* campaigns)
 
@@ -62,11 +51,11 @@ For pausing laggards, shifting budget, or other write actions, point the user at
 
 ## Before You Start
 
-1. **Confirm Stripe is connected** — Attribution requires Stripe revenue events; without it, you only get click data
+1. **Confirm a revenue connector is attached** — Attribution requires Stripe/ChartMogul revenue events; without one, you only get click data
 2. **Confirm UTM hygiene** — Campaigns without UTM parameters can't be attributed to source
 3. **Time range** — Default to last 30 days; 60-90 days for monthly comparison; 12 months for strategic planning
 4. **Attribution model** — Default to last-touch; switch to first-touch or linear if specified
-5. **Property ID** — Ask which property to analyze
+5. **Property** — The MCP auto-resolves the property for a single-property key; for a multi-property key, call `list_properties` and pass the chosen `propertyId`
 
 ## Core Workflow
 
@@ -74,24 +63,22 @@ For pausing laggards, shifting budget, or other write actions, point the user at
 
 **Primary call** — full-funnel attribution merging ad spend with sessions and revenue:
 
-- `GET /api/v1/properties/{propertyId}/ads-attribution?startDate=YYYY-MM-DD&endDate=YYYY-MM-DD`
+- `get_ads_attribution` with `startDate` and `endDate` (both `YYYY-MM-DD`)
 
 This returns per-campaign rows with `campaign`, `utm_campaign`, `platforms`, `target_urls`, `top_landing_page`, `spend`, `impressions`, `clicks`, `sessions`, `ad_conversions`, `revenue_conversions`, `revenue`, `roas`, `trial_count`, `true_cpa`, `cost_per_trial`, `click_to_session_rate`, `avg_hours_to_convert`, plus top-level `totals`, `unmatched_ad_campaigns` (UTM hygiene gaps), `unmatched_utm_campaigns` (organic/email traffic), `breakdowns`, `date_range`, and `connections`. NOTE revenue and roas are 0/null on properties without a revenue connector. Empty `campaigns[]` with non-empty `unmatched_*` is the strongest signal that UTM tagging needs work — the data is flowing, it just isn't joining.
 
 **Spend supplement (Path A — connectors connected):**
 
-- Meta: `GET /api/meta-connections?propertyId={propertyId}` → pick a connection → `GET /api/meta-connections/{id}/accounts/{accountId}/daily-insights?since=&until=`
-- Google: `GET /api/google-ads-connections?propertyId={propertyId}` → pick a connection → `GET /api/google-ads-connections/{id}/campaigns?customerId={customerId}`
+- Meta: `list_meta_connections` → pick a connection → `get_meta_daily_insights` with that connection `id`, its `accountId`, and `since`/`until` (`YYYY-MM-DD`)
+- Google: `list_google_ads_connections` → pick a connection → `list_google_ads_campaigns` with that connection `id` and `customerId`
 
-**Path A2 fallback (no connectors):** ask the user to paste a CSV from Ads Manager. The skill joins those rows to the `ads-attribution` revenue side.
+**Path A2 fallback (no connectors):** ask the user to paste a CSV from Ads Manager. The skill joins those rows to the `get_ads_attribution` revenue side.
 
-**Context endpoints** for source/page-level breakdowns:
+**Context tools** for source/page-level breakdowns:
 
-- `GET /api/external/v1/properties/{propertyId}/traffic/breakdown` — UTM source/medium/campaign + device + location dimensions
-- `GET /properties/{propertyId}/forms/breakdown` — Conversion events (signups, purchases)
-- `GET /properties/{propertyId}/pages/breakdown` — Page performance (the public API doesn't expose a `page_group` filter; pull all pages and filter client-side if needed)
-
-All endpoints accept the same Bearer `HUMBLYTICS_API_KEY`.
+- `get_traffic_breakdown` — UTM source/medium/campaign + device + location dimensions
+- `get_forms_breakdown` — Conversion events (signups, purchases)
+- `get_pages_breakdown` — Page performance (there's no `page_group` filter; pull all pages and filter client-side if needed)
 
 ### Step 2: Build the Attribution Table
 
@@ -196,14 +183,14 @@ TRACKING GAPS:
 
 ## Creative Inspection (Path A only)
 
-When `ads-attribution` flags a high-spend Meta campaign, drill into the underlying creative before recommending action. `ads-attribution` does NOT return Meta's internal campaign IDs, so you must first resolve the connection and campaign IDs from `meta-connections` — the ads call requires a real Meta `campaignId`, not the `utm_campaign` string (an unknown/fake id returns a Graph API "object does not exist" error). Verified live flow (2026-05-29):
+When `get_ads_attribution` flags a high-spend Meta campaign, drill into the underlying creative before recommending action. `get_ads_attribution` does NOT return Meta's internal campaign IDs, so you must first resolve the connection and campaign IDs from `list_meta_connections` — the ads call requires a real Meta `campaignId`, not the `utm_campaign` string (an unknown/fake id returns a Graph API "object does not exist" error). Verified live flow (2026-05-29):
 
-1. `GET /api/meta-connections` → take the connection `id` (and `adAccounts[].id`).
-2. `GET /api/meta-connections/{id}/campaigns` → list campaigns per account with their real Meta `id`, `name`, `status`. (Equivalently `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns`.) Match the flagged `utm_campaign`/name to its Meta campaign `id`.
-3. `GET /api/meta-connections/{id}/campaigns/{campaignId}/ads` — list ads in that campaign with creative (`thumbnailUrl`, `imageUrl`, title, body), `status`, `adsetId`, destination URL.
-4. `GET /api/meta-connections/{id}/ads/{adId}` — full creative metadata (name, title, body, etc.) for one ad.
+1. `list_meta_connections` → take the connection `id` (and `adAccounts[].id`).
+2. `list_meta_campaigns` (with the connection `id`) → list campaigns per account with their real Meta `id`, `name`, `status`. (Equivalently `list_meta_account_campaigns` with the connection `id` and `accountId`.) Match the flagged `utm_campaign`/name to its Meta campaign `id`.
+3. `list_meta_campaign_ads` (with the connection `id` and `campaignId`) — list ads in that campaign with creative (`thumbnailUrl`, `imageUrl`, title, body), `status`, `adsetId`, destination URL.
+4. `get_meta_ad_creative` (with the connection `id` and `adId`) — full creative metadata (name, title, body, etc.) for one ad.
 
-Note: `GET /api/meta-connections/{id}/accounts/{accountId}/campaigns/{campaignId}/ads` and `.../accounts/{accountId}/ads` are NOT valid — they fall through to the SPA and return an HTML page (`<!doctype html>`), not JSON. Use the connection-level `/campaigns/{campaignId}/ads` path above.
+Also available when you need connection health or a single account's campaigns over a window: `get_meta_connection_status` (connection `id`) for status, and `list_meta_account_campaigns` (connection `id`, `accountId`, `since`, `until`) for the per-account campaign list.
 
 Look for: destination URL mismatch (ad copy promises X, lands on Y), broken links, low-quality stock visuals, or one ad in the campaign hogging the spend with poor performance. This is the read-only diagnostic step. To pause the ad, hand off to Meta CLI (Path B).
 

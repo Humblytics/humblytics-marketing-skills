@@ -40,7 +40,7 @@ Followed by markdown content with these sections:
 Skills that use live data call the **Humblytics MCP server** — they invoke `mcp__humblytics__*` tools, never raw HTTP. There is no base URL or `curl` in the skills.
 
 - **Server name**: `humblytics`
-- **URL**: `https://mcp.humblytics.com/mcp` (Streamable HTTP, ~36 tools)
+- **URL**: `https://mcp.humblytics.com/v1` (Streamable HTTP, ~36 tools)
 - **Auth**: sent as connection headers — `Authorization: Bearer $HUMBLYTICS_API_KEY` and `X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID`. Set once when the server is registered (see the repo README), not per call.
 - **Property**: the MCP auto-resolves the property for a single-property key; for a multi-property key, call `list_properties` and pass the matching `propertyId`.
 - **Tools**: traffic (`get_traffic_summary`, `get_traffic_trends`, `get_traffic_breakdown`, `get_entry_exit_pages`, `get_traffic_realtime`), pages (`get_pages_breakdown`, `get_page_details`), clicks/forms (`get_clicks_breakdown`, `get_clicks_details`, `get_forms_breakdown`, `get_forms_details`), funnels (`query_funnel`, `get_funnel_sankey`, `get_funnel_suggestions`, `list_saved_funnels`, `save_funnel`), split tests (`get_split_test_recommendations`, `create_split_test`, `list_split_tests`, `get_split_test`, `update_split_test`, `stop_split_test`), ads (`get_ads_attribution` + the `list_meta_*`/`get_meta_*` and `list_google_ads_*`/`get_google_ads_connection` tools).

@@ -52,7 +52,7 @@ The five live-data skills read your analytics through the **Humblytics MCP serve
 | | |
 |---|---|
 | **Server name** | `humblytics` |
-| **URL** | `https://mcp.humblytics.com/mcp` |
+| **URL** | `https://mcp.humblytics.com/v1` |
 | **Transport** | Streamable HTTP |
 | **Auth headers** | `Authorization: Bearer $HUMBLYTICS_API_KEY` and `X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID` |
 
@@ -67,7 +67,7 @@ Sign up at [app.humblytics.com](https://app.humblytics.com) and grab your **API 
 **Claude Code**
 
 ```bash
-claude mcp add humblytics --transport http https://mcp.humblytics.com/mcp \
+claude mcp add humblytics --transport http https://mcp.humblytics.com/v1 \
   --header "Authorization: Bearer $HUMBLYTICS_API_KEY" \
   --header "X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID"
 ```
@@ -78,7 +78,7 @@ claude mcp add humblytics --transport http https://mcp.humblytics.com/mcp \
 {
   "mcpServers": {
     "humblytics": {
-      "url": "https://mcp.humblytics.com/mcp",
+      "url": "https://mcp.humblytics.com/v1",
       "headers": {
         "Authorization": "Bearer ${HUMBLYTICS_API_KEY}",
         "X-Humblytics-Property-Id": "${HUMBLYTICS_PROPERTY_ID}"
@@ -92,7 +92,7 @@ claude mcp add humblytics --transport http https://mcp.humblytics.com/mcp \
 
 ```toml
 [mcp_servers.humblytics]
-url = "https://mcp.humblytics.com/mcp"
+url = "https://mcp.humblytics.com/v1"
 http_headers = { "Authorization" = "Bearer ${HUMBLYTICS_API_KEY}", "X-Humblytics-Property-Id" = "${HUMBLYTICS_PROPERTY_ID}" }
 ```
 

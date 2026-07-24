@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "humblytics": {
+      "url": "https://mcp.humblytics.com/v1",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_KEY"
+      }
+    }
+  }
+}

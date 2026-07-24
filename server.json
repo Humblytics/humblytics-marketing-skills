@@ -1,0 +1,21 @@
+{
+  "name": "humblytics",
+  "display_name": "Humblytics",
+  "description": "Give Claude, Cursor and other AI agents access to your live website analytics and experiments — so they can find conversion problems, recommend tests, implement tracking and evaluate results.",
+  "homepage": "https://humblytics.com",
+  "license": "Proprietary",
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.humblytics.com/v1"
+    }
+  ],
+  "authentication": {
+    "type": "header",
+    "header": "Authorization",
+    "format": "Bearer {api_key}",
+    "instructions": "Sign up at https://humblytics.com and get your API key from Dashboard → Utilities → API."
+  },
+  "categories": ["analytics", "testing", "marketing"],
+  "repository": "https://github.com/Humblytics/humblytics-marketing-skills"
+}

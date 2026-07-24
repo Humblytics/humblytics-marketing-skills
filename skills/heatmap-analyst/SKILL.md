@@ -1,6 +1,6 @@
 ---
 name: heatmap-analyst
-description: "Click-engagement analyst that pulls element-level click data, a page-level scroll proxy, and bounce/exit signals from Humblytics to surface UX friction and ignored CTAs. Generates prioritized, data-backed optimization recommendations. NOTE: the Humblytics public API does NOT provide pixel-level click heatmaps, scroll-depth distributions, or rage-click detection — those need a dedicated heatmap tool. Use when auditing element-level click patterns, finding ignored CTAs, gauging scroll engagement, or diagnosing on-page friction. Triggers: click analysis, element clicks, ignored CTA, click engagement, scroll engagement, UX friction, interaction audit."
+description: "Click-engagement analyst that pulls element-level click data, a page-level scroll proxy, and bounce/exit signals from Humblytics to surface UX friction and ignored CTAs. Generates prioritized, data-backed optimization recommendations. NOTE: Humblytics does NOT provide pixel-level click heatmaps, scroll-depth distributions, or rage-click detection — those need a dedicated heatmap tool. Use when auditing element-level click patterns, finding ignored CTAs, gauging scroll engagement, or diagnosing on-page friction. Triggers: click analysis, element clicks, ignored CTA, click engagement, scroll engagement, UX friction, interaction audit."
 metadata:
   version: 1.0.0
   author: Humblytics
@@ -10,9 +10,9 @@ metadata:
 
 ## Purpose
 
-Analyze Humblytics click-engagement data (element/target-level clicks, a single page-level scroll proxy, and bounce/exit signals) to diagnose UX friction and generate prioritized design recommendations. This skill turns the interaction data the API actually exposes into specific, ranked improvements for layout, CTAs, and content hierarchy.
+Analyze Humblytics click-engagement data (element/target-level clicks, a single page-level scroll proxy, and bounce/exit signals) to diagnose UX friction and generate prioritized design recommendations. Live data comes from the Humblytics MCP (the click and page tools — `get_clicks_details`, `get_clicks_breakdown`, `get_page_details`, `get_pages_breakdown`, `get_entry_exit_pages`). This skill turns the interaction data Humblytics actually exposes into specific, ranked improvements for layout, CTAs, and content hierarchy.
 
-> **Scope note — what the Humblytics public API does and does not give you.** The API provides **element/target-level click counts** (with UTM breakdown), a **single average scroll percentage** per page, and **bounce/exit** signals. It does **NOT** provide pixel-level click heatmaps (x/y coordinates), a 25/50/75/100 scroll-depth distribution, rage-click detection, dead-zone maps, or per-device click segmentation. Anything in that second list requires a dedicated heatmap tool (e.g. Hotjar, Microsoft Clarity) — do not promise it from Humblytics. See **"NOT available via Humblytics API"** below.
+> **Scope note — what Humblytics does and does not give you.** Humblytics provides **element/target-level click counts** (with UTM breakdown), a **single average scroll percentage** per page, and **bounce/exit** signals. It does **NOT** provide pixel-level click heatmaps (x/y coordinates), a 25/50/75/100 scroll-depth distribution, rage-click detection, dead-zone maps, or per-device click segmentation. Anything in that second list requires a dedicated heatmap tool (e.g. Hotjar, Microsoft Clarity) — do not promise it from Humblytics. See **"NOT available via Humblytics"** below.
 
 ## When to Use
 
@@ -23,25 +23,15 @@ Analyze Humblytics click-engagement data (element/target-level clicks, a single 
 - You're auditing a page before a redesign or A/B test
 - Investigating whether traffic from a specific source behaves differently on-page
 
-## Credentials
+## Setup
 
-This skill reads a Humblytics API key from the environment. **Never paste API keys directly into chat** — they persist in transcripts and logs.
+This skill reads live data through the **Humblytics MCP** (server `humblytics`) — see the repo README to connect it. Once connected, the skill calls `mcp__humblytics__*` tools; the MCP handles auth, base URL, and property resolution, so there are no keys to paste or `.env` files to source here. **Never paste API keys into chat** — the key lives once in the MCP connection headers, not in transcripts.
 
-Setup (one time):
-1. `cp .env.example .env` at the **repo root** (the `.env.example` lives at the repo root, not in this skill dir) and fill in `HUMBLYTICS_API_KEY`
-2. `source .env` in your shell before running the agent (or use `direnv`, or add the exports to your shell profile)
-3. Get the key from Humblytics Dashboard > Settings > API
-4. The skill will ask for your **Property ID** (also in Dashboard > Settings > API)
-
-- **Base URL**: `https://app.humblytics.com/api/external/v1`
-- **Auth header**: `Authorization: Bearer $HUMBLYTICS_API_KEY`
-- **Docs**: https://docs.humblytics.com/
-
-If `HUMBLYTICS_API_KEY` is not in the environment, stop and point the user at `.env.example` (at the repo root) — do not accept the key in chat.
+The MCP auto-resolves the property for a single-property key (the common case). For a multi-property key, call `list_properties` and pass the chosen `propertyId` to each tool.
 
 ## Before You Start
 
-1. **Confirm the property ID** — Ask which Humblytics property to analyze
+1. **Confirm the property** — With a multi-property key, run `list_properties` and confirm which property to analyze (single-property keys auto-resolve)
 2. **Identify the target page(s)** — Which URL(s) are in scope
 3. **Time range** — Default to last 30 days; shorter windows are noisier
 4. **Sample size check** — Pages below ~500 sessions in the window produce unreliable heatmaps
@@ -60,31 +50,31 @@ For each target page, fetch what the API actually returns:
 
 > Click **CTR is not a field** in the API — derive an engagement rate yourself as `clicks / unique_sessions` (or per-page `top_target.share`) when you need a CTR-like proxy.
 
-Relevant Humblytics endpoints (all require `Authorization: Bearer $HUMBLYTICS_API_KEY`; pass `start`, `end` as ISO8601 and a `timezone` IANA name — there is no `?period=` shorthand):
-- `GET /properties/{propertyId}/clicks/details?page=/path&start=…&end=…&timezone=…` — element/target-level clicks + UTM breakdown
-- `GET /properties/{propertyId}/clicks/breakdown?start=…&end=…&timezone=…` — cross-page top targets
-- `GET /properties/{propertyId}/pages/details?page=/path&start=…&end=…&timezone=…` — `avg_scroll_percent` (scroll proxy) + `bounce_rate`
-- `GET /properties/{propertyId}/pages/breakdown?start=…&end=…&timezone=…` — page-level views/bounce across pages
-- `GET /properties/{propertyId}/traffic/entry-exit-pages?start=…&end=…&timezone=…` — entry/exit friction proxy
+Relevant Humblytics MCP tools (all take `start`, `end` as ISO-8601 and a `timezone` IANA name — there is no `?period=` shorthand; scroll depth lives in the page tools):
+- `get_clicks_details` (`page: "/path"`) — element/target-level clicks + UTM breakdown for one page
+- `get_clicks_breakdown` — cross-page top targets
+- `get_page_details` (`page: "/path"`) — `avg_scroll_percent` (scroll proxy) + `bounce_rate` for one page
+- `get_pages_breakdown` — page-level views/bounce across pages
+- `get_entry_exit_pages` — entry/exit friction proxy
 
-> **NOT available via Humblytics API (needs a dedicated heatmap tool):** pixel-level click coordinate heatmaps, scroll-depth distribution (25/50/75/100%), rage-click detection, dead-zone maps, and per-device click segmentation. If the user needs any of these, tell them Humblytics does not return them and point to a purpose-built heatmap tool (Hotjar, Microsoft Clarity, etc.).
+> **NOT available via Humblytics (needs a dedicated heatmap tool):** pixel-level click coordinate heatmaps, scroll-depth distribution (25/50/75/100%), rage-click detection, dead-zone maps, and per-device click segmentation. If the user needs any of these, tell them Humblytics does not return them and point to a purpose-built heatmap tool (Hotjar, Microsoft Clarity, etc.).
 
 ### Step 2: The Three Diagnostic Questions
 
 Run each page through these three questions, using only data the API returns:
 
 **Q1 — Are visitors clicking what you *want* them to click?**
-- Primary CTA click share: is the CTA `target` a meaningful fraction of `total_clicks` (use its `share` from `clicks/breakdown` or `clicks` from `clicks/details`)?
+- Primary CTA click share: is the CTA `target` a meaningful fraction of `total_clicks` (use its `share` from `get_clicks_breakdown` or `clicks` from `get_clicks_details`)?
 - Secondary CTA click share: proportional to its importance?
 - Which `target` dominates clicks, and is it a high-value action or a low-value/navigation element?
 
 **Q2 — Are visitors engaging deeply enough to *see* the important content?**
 - `avg_scroll_percent`: a low average (e.g. ~24%) suggests most visitors never reach below-fold content. This is a single average, **not** a depth distribution — do not claim "X% reached 50%".
 - Is the primary CTA likely above or below where that average scroll lands?
-- Cross-reference with `bounce_rate` from `pages/details`.
+- Cross-reference with `bounce_rate` from `get_page_details`.
 
 **Q3 — Where is the friction?**
-- High `bounce_rate` / exit share (from `pages/details` and `traffic/entry-exit-pages`) on a page that should convert = friction proxy.
+- High `bounce_rate` / exit share (from `get_page_details` and `get_entry_exit_pages`) on a page that should convert = friction proxy.
 - Low scroll engagement on a long page where the CTA sits deep.
 - A CTA `target` that gets almost no clicks despite high page views = ignored CTA.
 
@@ -121,19 +111,19 @@ PAGE VIEWS / UNIQUE VISITORS: [page_views] / [unique_visitors]
 HEADLINE FINDING:
 [1 sentence capturing the biggest insight]
 
-CLICK PATTERN SUMMARY (from clicks/details + clicks/breakdown):
+CLICK PATTERN SUMMARY (from get_clicks_details + get_clicks_breakdown):
 - Primary CTA target + click share: [target] ([share]% of clicks)
 - Highest-click element: [target] ([share]% of clicks)
 - Total clicks / unique sessions: [total_clicks] / [unique_sessions]
 - Notable UTM skew (if any): [utm_source/medium] drives [share]% of a target's clicks
 
-SCROLL ENGAGEMENT (from pages/details — single average, not a distribution):
+SCROLL ENGAGEMENT (from get_page_details — single average, not a distribution):
 - avg_scroll_percent: [N]%
 - Implication: [most visitors likely do / do not reach below-fold content]
 
 FRICTION PROXIES:
 - bounce_rate: [N]
-- Top exit pages (entry-exit-pages): [pages]
+- Top exit pages (get_entry_exit_pages): [pages]
 
 TOP 3 RECOMMENDATIONS (prioritized):
 1. [Change] — Expected impact: [X] — Difficulty: [level]

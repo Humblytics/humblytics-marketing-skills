@@ -63,7 +63,7 @@ This gives the user a clear way to correct without re-running the whole analysis
 Don't ask things you can derive yourself:
 
 - Don't ask the URL if you can read it from the request context
-- Don't ask for the current CVR if you can pull it from `getAnalytics` / Humblytics API
+- Don't ask for the current CVR if you can pull it from the Humblytics MCP (`get_traffic_summary`, `get_pages_breakdown`, etc.)
 - Don't ask "what's your goal?" 4 times — pick the highest-probability one and confirm
 
 The preflight is for **context the data can't tell you** — vertical, deal size, recent strategic changes, audience awareness level.

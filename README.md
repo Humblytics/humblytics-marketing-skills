@@ -133,7 +133,7 @@ Run the funnel-reporter skill for my /signup flow.
 
 The `skills/` directory contains the same 12 skills as plain markdown files following the [Agent Skills](https://agentskills.io) spec. They work with Claude Code, Cursor, Windsurf, Cline, and any assistant that supports the spec — without needing the MCP server.
 
-### Live-data skills (connect to Humblytics API)
+### Live-data skills (connect to the Humblytics MCP)
 
 | Skill | Description |
 |-------|-------------|
@@ -155,7 +155,41 @@ The `skills/` directory contains the same 12 skills as plain markdown files foll
 | [ad-expert](skills/ad-expert/SKILL.md) | Paid advertising across Meta, Google, TikTok, LinkedIn, YouTube |
 | [content-strategist](skills/content-strategist/SKILL.md) | Multi-format content strategy: articles, newsletters, social, video, SEO |
 
-To use live-data skills directly (outside the MCP server), set `HUMBLYTICS_API_KEY` in your environment. Get your key from **Dashboard → Utilities → API**.
+### Installing the standalone skills
+
+**Claude Code** — clone the repo, or reference the skills directly from your project's `AGENTS.md`:
+
+```bash
+git clone https://github.com/Humblytics/humblytics-marketing-skills.git
+```
+
+**Cursor / Windsurf / other assistants** — copy the relevant `SKILL.md` files into your project's `.cursor/skills/` (or equivalent) directory, or point your assistant at this repository.
+
+### Connecting the live-data skills
+
+The five live-data skills call the `humblytics` MCP tools directly — register the server as described in [Connect in 30 seconds](#connect-in-30-seconds) and they work as-is. There is no API key to paste into a URL and no base URL to manage; the MCP handles auth, routing, and property resolution.
+
+If you manage several properties, you can pin one for the whole connection by adding an optional `X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID` header alongside the `Authorization` header, instead of passing `propertyId` per tool call. Copy `.env.example` to a gitignored `.env` and `source` it before registering the server.
+
+> **Your API key is a secret.** Keep it out of `CLAUDE.md`, `.cursorrules`, `AGENTS.md`, chat messages, and anything committed to git. Store it in an environment variable and reference it as `$HUMBLYTICS_API_KEY`.
+
+To verify, ask your agent to list the `humblytics` server's tools and call `get_traffic_realtime` with no arguments. If tools don't appear, confirm `$HUMBLYTICS_API_KEY` is set in the environment the client launched from, then reload the client.
+
+> The context-only skills (page-cro, email-sequences, seo-strategist, marketing-strategist, copywriting, ad-expert, content-strategist) work without any connection. `ad-expert` will additionally pull live spend and attribution through the `humblytics` MCP when it's connected, but doesn't require it.
+
+## Meta Ads and Google Ads — three paths
+
+### Path A — Humblytics connectors (preferred, read-only)
+
+Connect Meta Ads and Google Ads once at **Connectors** in the Humblytics dashboard. Skills then read campaign metadata, daily insights, ad creative, and full-funnel revenue attribution through Humblytics' managed connections — using the same `HUMBLYTICS_API_KEY` you already set up. No Meta App Review, no Google Ads developer token. `revenue-attributor` and `ad-expert` use this path by default. **Read-only** — connectors don't let agents pause campaigns or change budgets.
+
+### Path B — Meta CLI (read + write)
+
+When the agent needs to *manage* campaigns (pause laggards, shift budget), use Meta's official `meta ads` CLI (released April 29, 2026). It's a published, supported tool that creates resources in `PAUSED` status by default. Scope the access token to a single ad account, store it in `.env` (never `CLAUDE.md`), and review every campaign before flipping it active. Skills hand off to the CLI for write actions; they don't call it directly.
+
+### Path C — Don't roll your own
+
+**Do not give the agent direct Meta Marketing API access through a system user on an unapproved developer app.** Routing production API traffic through a draft or unpublished Meta App — regardless of how the access token was issued — is how ad accounts, including long-standing ones with seven-figure spend, are getting permanently banned. Meta is actively enforcing against unapproved-app API traffic. Use Path A or Path B above. The only safe DIY route is a Meta Developer App with the Marketing API product and **full App Review completed** for the permissions you need (e.g. `ads_read`) — budget weeks for review.
 
 ## Security
 

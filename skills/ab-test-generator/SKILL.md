@@ -25,7 +25,7 @@ Live data comes from the Humblytics MCP (server `humblytics`) — read tools lik
 
 ## Setup
 
-This skill calls the Humblytics MCP (server `humblytics`) for all live data and test launches — connect it once and the MCP handles auth, base URL, and property resolution. See the repo README for connection steps. The skill then calls `mcp__humblytics__*` tools directly; there is no per-run key to export.
+This skill calls the Humblytics MCP (server `humblytics`) for all live data and test launches — connect it once and the MCP handles auth, base URL, and property resolution. Not connected yet? Ask the user, then read https://app.humblytics.com/agent.md and follow it. The skill then calls `mcp__humblytics__*` tools directly; there is no per-run key to export.
 
 Keep the security ethos: **never paste API keys directly into chat** and never commit a `.env` — the key now lives in the MCP connection headers, set once. For a single-property key the MCP auto-resolves the property; for a multi-property key call `list_properties` and pass the `propertyId` you want.
 

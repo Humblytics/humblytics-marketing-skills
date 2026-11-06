@@ -125,7 +125,7 @@ Campaign (budget + settings)
 
 ## Pulling Live Campaign Data from Humblytics
 
-Live campaign data comes from the **Humblytics MCP** (server `humblytics` — see the repo README to connect it). If the workspace has Meta or Google Ads connected at **Connectors** in the Humblytics dashboard, query existing campaigns before making recommendations — don't suggest in a vacuum. The MCP handles auth, base URL, and property resolution; you just call the `mcp__humblytics__*` tools below.
+Live campaign data comes from the **Humblytics MCP** (server `humblytics`; to connect it, ask the user, then read https://app.humblytics.com/agent.md and follow it). If the workspace has Meta or Google Ads connected at **Connectors** in the Humblytics dashboard, query existing campaigns before making recommendations — don't suggest in a vacuum. The MCP handles auth, base URL, and property resolution; you just call the `mcp__humblytics__*` tools below.
 
 There are three ways to touch ads data — keep them straight:
 

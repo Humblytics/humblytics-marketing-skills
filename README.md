@@ -10,55 +10,17 @@ You need a [Humblytics](https://humblytics.com) account on the Plus plan or high
 
 ## Connect in 30 seconds
 
-### Claude Code
-
-```bash
-claude mcp add humblytics --transport http https://mcp.humblytics.com/v1 \
-  --header "Authorization: Bearer $HUMBLYTICS_API_KEY"
-```
-
-### Cursor
-
-Add to `.cursor/mcp.json`:
-
-```json
-{
-  "mcpServers": {
-    "humblytics": {
-      "url": "https://mcp.humblytics.com/v1",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }
-  }
-}
-```
-
-### VS Code (GitHub Copilot)
-
-Add to `.vscode/mcp.json`:
-
-```json
-{
-  "servers": {
-    "humblytics": {
-      "type": "http",
-      "url": "https://mcp.humblytics.com/v1",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_KEY"
-      }
-    }
-  }
-}
-```
-
-### Any MCP client (generic)
+Paste this into your agent (Claude Code, Codex, Cursor or any agent that can make web requests):
 
 ```
-Transport:     Streamable HTTP
-URL:           https://mcp.humblytics.com/v1
-Auth header:   Authorization: Bearer <your-api-key>
+Read https://app.humblytics.com/agent.md and set up Humblytics for me.
 ```
+
+It signs you up or signs you in, connects the `humblytics` MCP server and installs the tracking script. You approve one link; you never copy a key.
+
+Chat apps (Claude.ai, ChatGPT) add Humblytics as a connector instead: [claude.ai connector](https://claude.ai/directory/connectors/humblytics-mcp), or `https://mcp.humblytics.com/v1` as a custom connector.
+
+Only want the skills? Paste `Read https://humblytics.com/skills.md and install the Humblytics skills.`
 
 ## What your agent can do
 
@@ -167,13 +129,13 @@ git clone https://github.com/Humblytics/humblytics-marketing-skills.git
 
 ### Connecting the live-data skills
 
-The five live-data skills call the `humblytics` MCP tools directly — register the server as described in [Connect in 30 seconds](#connect-in-30-seconds) and they work as-is. There is no API key to paste into a URL and no base URL to manage; the MCP handles auth, routing, and property resolution.
+The five live-data skills call the `humblytics` MCP tools directly — connect with [the one prompt above](#connect-in-30-seconds) (it follows https://app.humblytics.com/agent.md) and they work as-is. There is no API key to paste into a URL and no base URL to manage; the MCP handles auth, routing, and property resolution.
 
 If you manage several properties, you can pin one for the whole connection by adding an optional `X-Humblytics-Property-Id: $HUMBLYTICS_PROPERTY_ID` header alongside the `Authorization` header, instead of passing `propertyId` per tool call. Copy `.env.example` to a gitignored `.env` and `source` it before registering the server.
 
 > **Your API key is a secret.** Keep it out of `CLAUDE.md`, `.cursorrules`, `AGENTS.md`, chat messages, and anything committed to git. Store it in an environment variable and reference it as `$HUMBLYTICS_API_KEY`.
 
-To verify, ask your agent to list the `humblytics` server's tools and call `get_traffic_realtime` with no arguments. If tools don't appear, confirm `$HUMBLYTICS_API_KEY` is set in the environment the client launched from, then reload the client.
+To verify, ask your agent to call `get_account_status`. If the tools don't appear, reconnect the server (`/mcp reconnect humblytics` in Claude Code) or start a new session.
 
 > The context-only skills (page-cro, email-sequences, seo-strategist, marketing-strategist, copywriting, ad-expert, content-strategist) work without any connection. `ad-expert` will additionally pull live spend and attribution through the `humblytics` MCP when it's connected, but doesn't require it.
 
@@ -181,7 +143,7 @@ To verify, ask your agent to list the `humblytics` server's tools and call `get_
 
 ### Path A — Humblytics connectors (preferred, read-only)
 
-Connect Meta Ads and Google Ads once at **Connectors** in the Humblytics dashboard. Skills then read campaign metadata, daily insights, ad creative, and full-funnel revenue attribution through Humblytics' managed connections — using the same `HUMBLYTICS_API_KEY` you already set up. No Meta App Review, no Google Ads developer token. `revenue-attributor` and `ad-expert` use this path by default. **Read-only** — connectors don't let agents pause campaigns or change budgets.
+Connect Meta Ads and Google Ads once at **Connectors** in the Humblytics dashboard. Skills then read campaign metadata, daily insights, ad creative, and full-funnel revenue attribution through Humblytics' managed connections, over the same MCP connection. No Meta App Review, no Google Ads developer token. `revenue-attributor` and `ad-expert` use this path by default. **Read-only** — connectors don't let agents pause campaigns or change budgets.
 
 ### Path B — Meta CLI (read + write)
 

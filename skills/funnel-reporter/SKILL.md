@@ -23,7 +23,7 @@ Pull live analytics data from the Humblytics API to generate comprehensive funne
 
 ## Connection
 
-Live data comes from the **Humblytics MCP** (server `humblytics`). The skill calls `mcp__humblytics__*` tools — the MCP handles auth, base URL, and property resolution. Connect it once per the repo README; never paste API keys into chat. The API key lives in the MCP connection headers, set at connect time.
+Live data comes from the **Humblytics MCP** (server `humblytics`). The skill calls `mcp__humblytics__*` tools — the MCP handles auth, base URL, and property resolution. Not connected yet? Ask the user, then follow https://app.humblytics.com/agent.md; never paste API keys into chat. The API key lives in the MCP connection headers, set at connect time.
 
 Property: for a single-property key the MCP auto-resolves the property. For a multi-property key, call `list_properties` and pass `propertyId` to each tool.
 

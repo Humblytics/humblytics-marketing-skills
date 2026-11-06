@@ -23,7 +23,7 @@ Connect ad spend to on-site conversion signals using Humblytics attribution, and
 
 ## Connecting Humblytics
 
-Live data comes from the **Humblytics MCP** (server `humblytics`). This skill calls `mcp__humblytics__*` tools — `get_ads_attribution`, `list_meta_connections`, `get_meta_daily_insights`, `list_google_ads_connections`, and friends — so there are no base URLs, curl calls, or API keys to wire up here. Connect the MCP once (see the repo README); the API key lives in the connection headers, set a single time.
+Live data comes from the **Humblytics MCP** (server `humblytics`). This skill calls `mcp__humblytics__*` tools — `get_ads_attribution`, `list_meta_connections`, `get_meta_daily_insights`, `list_google_ads_connections`, and friends — so there are no base URLs, curl calls, or API keys to wire up here. Connect the MCP once (ask the user, then follow https://app.humblytics.com/agent.md); the API key lives in the connection headers, set a single time.
 
 - **Never paste API keys into chat** — they persist in transcripts and logs. The key belongs in the MCP connection config, never in `CLAUDE.md`, `.cursorrules`, or any file committed to git.
 - **Property**: for a single-property key the MCP auto-resolves the property, so nothing to pass. For a multi-property key, call `list_properties` and pass the chosen `propertyId`.

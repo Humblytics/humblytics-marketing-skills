@@ -25,7 +25,7 @@ Analyze Humblytics click-engagement data (element/target-level clicks, a single 
 
 ## Setup
 
-This skill reads live data through the **Humblytics MCP** (server `humblytics`) — see the repo README to connect it. Once connected, the skill calls `mcp__humblytics__*` tools; the MCP handles auth, base URL, and property resolution, so there are no keys to paste or `.env` files to source here. **Never paste API keys into chat** — the key lives once in the MCP connection headers, not in transcripts.
+This skill reads live data through the **Humblytics MCP** (server `humblytics`) ; to connect it, ask the user, then follow https://app.humblytics.com/agent.md. Once connected, the skill calls `mcp__humblytics__*` tools; the MCP handles auth, base URL, and property resolution, so there are no keys to paste or `.env` files to source here. **Never paste API keys into chat** — the key lives once in the MCP connection headers, not in transcripts.
 
 The MCP auto-resolves the property for a single-property key (the common case). For a multi-property key, call `list_properties` and pass the chosen `propertyId` to each tool.
 

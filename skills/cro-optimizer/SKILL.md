@@ -23,7 +23,7 @@ Analyze conversion funnels using live Humblytics analytics (via the Humblytics M
 
 ## Credentials
 
-Live data comes from the **Humblytics MCP** (server `humblytics`). Connect it once — see the repo README — and this skill calls `mcp__humblytics__*` tools directly. No API keys, base URLs, or `.env` plumbing live in the skill.
+Live data comes from the **Humblytics MCP** (server `humblytics`). Connect it once (ask the user, then follow https://app.humblytics.com/agent.md) and this skill calls `mcp__humblytics__*` tools directly. No API keys, base URLs, or `.env` plumbing live in the skill.
 
 - **Never paste API keys into chat** — they persist in transcripts and logs. Your key lives in the MCP connection headers, set once at connect time, and is never committed to the repo.
 - **Property**: the MCP auto-resolves your property for a single-property key (the common case). For a multi-property key, call `list_properties` and pass the `propertyId` you want to analyze.
